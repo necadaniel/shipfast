@@ -3,9 +3,23 @@
 import type { JSX } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Popover, Transition } from "@headlessui/react";
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Separator } from "@/components/ui/separator";
+import { Menu, ChevronDown } from "lucide-react";
 import logo from "@/app/icon.png";
 import config from "@/config";
 import { categories } from "../content";
@@ -27,67 +41,36 @@ const cta: JSX.Element = (
 
 const ButtonPopoverCategories = () => {
   return (
-    <Popover className="relative z-30">
-      {({ open }) => (
-        <>
-          <Popover.Button
-            className="link no-underline flex flex-nowrap items-center gap-1 text-base-content/80 hover:text-base-content active:text-base-content focus:text-base-content duration-100"
-            title="Open Blog categories"
-          >
-            Categories
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className={`w-5 h-5 duration-200 ${
-                open ? "transform rotate-180 " : ""
-              }`}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex flex-nowrap items-center gap-1 text-muted-foreground hover:text-foreground focus:text-foreground duration-100 p-0 h-auto font-normal"
+        >
+          Categories
+          <ChevronDown className="w-5 h-5 duration-200" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-screen max-w-full sm:max-w-sm">
+        {categories.map((category) => (
+          <DropdownMenuItem key={category.slug} asChild>
+            <Link
+              className="block text-left p-3 cursor-pointer focus:bg-muted rounded-md duration-200"
+              href={`/blog/category/${category.slug}`}
             >
-              <path
-                fillRule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </Popover.Button>
-          <Transition
-            enter="transition duration-100 ease-out"
-            enterFrom="transform scale-95 opacity-0"
-            enterTo="transform scale-100 opacity-100"
-            leave="transition duration-75 ease-out"
-            leaveFrom="transform scale-100 opacity-100"
-            leaveTo="transform scale-95 opacity-0"
-          >
-            <Popover.Panel className="absolute left-0 z-30 mt-3 w-screen max-w-full sm:max-w-sm transform">
-              {({ close }) => (
-                <div className="overflow-hidden rounded-box shadow-lg ring-1 ring-base-content ring-opacity-5">
-                  <div className="relative grid gap-2 bg-base-100 p-2 overflow-hidden">
-                    {categories.map((category) => (
-                      <div key={category.slug} onClick={() => close()}>
-                        <Link
-                          className="block text-left p-3 -m-1 cursor-pointer hover:bg-base-200 rounded-box duration-200"
-                          href={`/blog/category/${category.slug}`}
-                        >
-                          <div className="">
-                            <p className="font-medium mb-0.5">
-                              {category?.titleShort || category.title}
-                            </p>
-                            <p className="text-sm opacity-80">
-                              {category?.descriptionShort ||
-                                category.description}
-                            </p>
-                          </div>
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </Popover.Panel>
-          </Transition>
-        </>
-      )}
-    </Popover>
+              <div>
+                <p className="font-medium mb-0.5">
+                  {category?.titleShort || category.title}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {category?.descriptionShort || category.description}
+                </p>
+              </div>
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
@@ -95,48 +78,31 @@ const ButtonAccordionCategories = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          setIsOpen(!isOpen);
-        }}
-        aria-expanded={isOpen}
-        type="button"
-        className="link no-underline flex justify-between items-center w-full "
-      >
-        Categories
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          className={`w-5 h-5 duration-200 ${
-            isOpen ? "transform rotate-180 " : ""
-          }`}
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex justify-between items-center w-full p-0 h-auto font-normal hover:bg-transparent"
         >
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </button>
-
-      {isOpen && (
-        <ul className="space-y-4">
+          Categories
+          <ChevronDown className={`w-5 h-5 duration-200 ${isOpen ? "transform rotate-180" : ""}`} />
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <ul className="space-y-4 mt-4">
           {categories.map((category) => (
             <li key={category.slug}>
               <Link
                 href={`/blog/category/${category.slug}`}
-                className="text-base-content/80 hover:text-base-content duration-100 link link-hover"
+                className="text-muted-foreground hover:text-foreground duration-100 underline-offset-4 hover:underline"
               >
                 {category?.titleShort || category.title}
               </Link>
             </li>
           ))}
         </ul>
-      )}
-    </>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 
@@ -153,12 +119,12 @@ const HeaderBlog = () => {
   }, [searchParams]);
 
   return (
-    <header className="bg-base-200">
+    <header className="bg-muted">
       <nav className="max-w-7xl flex items-center justify-between px-8 py-3 mx-auto">
         {/* Your logo/name on large screens */}
         <div className="flex lg:flex-1">
           <Link
-            className="flex items-center gap-2 shrink-0 "
+            className="flex items-center gap-2 shrink-0"
             href="/"
             title={`${config.appName} homepage`}
           >
@@ -170,32 +136,62 @@ const HeaderBlog = () => {
               width={32}
               height={32}
             />
-            <span className="font-extrabold text-lg">{config.appName}</span>
+            <span className="font-extrabold text-lg text-foreground">{config.appName}</span>
           </Link>
         </div>
+
         {/* Burger button to open menu on mobile */}
         <div className="flex lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-box p-2.5"
-            onClick={() => setIsOpen(true)}
-          >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 text-base-content"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
-          </button>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="-m-2.5 p-2.5">
+                <span className="sr-only">Open main menu</span>
+                <Menu className="w-6 h-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:max-w-sm">
+              {/* Your logo/name on small screens */}
+              <div className="flex items-center justify-between mb-6">
+                <Link
+                  className="flex items-center gap-2 shrink-0"
+                  title={`${config.appName} homepage`}
+                  href="/"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Image
+                    src={logo}
+                    alt={`${config.appName} logo`}
+                    className="w-8"
+                    priority={true}
+                    width={32}
+                    height={32}
+                  />
+                  <span className="font-extrabold text-lg text-foreground">{config.appName}</span>
+                </Link>
+              </div>
+
+              {/* Your links on small screens */}
+              <div className="flex flex-col gap-y-4 items-start mb-6">
+                {links.map((link) => (
+                  <Link
+                    href={link.href}
+                    key={link.href}
+                    className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                    title={link.label}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <ButtonAccordionCategories />
+              </div>
+
+              <Separator className="mb-6" />
+
+              {/* Your CTA on small screens */}
+              <div className="flex flex-col">{cta}</div>
+            </SheetContent>
+          </Sheet>
         </div>
 
         {/* Your links on large screens */}
@@ -204,7 +200,7 @@ const HeaderBlog = () => {
             <Link
               href={link.href}
               key={link.href}
-              className="link link-hover text-base-content/80 hover:text-base-content active:text-base-content focus:text-base-content duration-100"
+              className="text-muted-foreground hover:text-foreground focus:text-foreground duration-100 underline-offset-4 hover:underline"
               title={link.label}
             >
               {link.label}
@@ -217,76 +213,6 @@ const HeaderBlog = () => {
         {/* CTA on large screens */}
         <div className="hidden lg:flex lg:justify-end lg:flex-1">{cta}</div>
       </nav>
-
-      {/* Mobile menu, show/hide based on menu state. */}
-      <div className={`relative z-50 ${isOpen ? "" : "hidden"}`}>
-        <div
-          className={`fixed inset-y-0 right-0 z-10 w-full px-8 py-3 overflow-y-auto bg-base-200 sm:max-w-sm sm:ring-1 sm:ring-neutral/10 transform origin-right transition ease-in-out duration-300`}
-        >
-          {/* Your logo/name on small screens */}
-          <div className="flex items-center justify-between">
-            <Link
-              className="flex items-center gap-2 shrink-0 "
-              title={`${config.appName} homepage`}
-              href="/"
-            >
-              <Image
-                src={logo}
-                alt={`${config.appName} logo`}
-                className="w-8"
-                placeholder="blur"
-                priority={true}
-                width={32}
-                height={32}
-              />
-              <span className="font-extrabold text-lg">{config.appName}</span>
-            </Link>
-            <button
-              type="button"
-              className="-m-2.5 rounded-box p-2.5"
-              onClick={() => setIsOpen(false)}
-            >
-              <span className="sr-only">Close menu</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Your links on small screens */}
-          <div className="flow-root mt-6">
-            <div className="py-4">
-              <div className="flex flex-col gap-y-4 items-start">
-                {links.map((link) => (
-                  <Link
-                    href={link.href}
-                    key={link.href}
-                    className="link link-hover"
-                    title={link.label}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                <ButtonAccordionCategories />
-              </div>
-            </div>
-            <div className="divider"></div>
-            {/* Your CTA on small screens */}
-            <div className="flex flex-col">{cta}</div>
-          </div>
-        </div>
-      </div>
     </header>
   );
 };

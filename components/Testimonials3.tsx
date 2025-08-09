@@ -1,5 +1,7 @@
-import Image from "next/image";
+
 import { StaticImageData } from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import config from "@/config";
 
 // The list of your testimonials. It needs 3 items to fill the row.
@@ -31,7 +33,7 @@ const list: {
   },
 ];
 
-// A single testimonial, to be rendered in  a list
+// A single testimonial, to be rendered in a list
 const Testimonial = ({ i }: { i: number }) => {
   const testimonial = list[i];
 
@@ -39,43 +41,41 @@ const Testimonial = ({ i }: { i: number }) => {
 
   return (
     <li key={i}>
-      <figure className="relative max-w-lg h-full p-6 md:p-10 bg-base-200 rounded-2xl max-md:text-sm flex flex-col">
-        <blockquote className="relative flex-1">
-          <p className="text-base-content/80 leading-relaxed">
-            {testimonial.text}
-          </p>
-        </blockquote>
-        <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 md:gap-8 md:pt-8 md:mt-8 border-t border-base-content/5">
-          <div className="w-full flex items-center justify-between gap-2">
-            <div>
-              <div className="font-medium text-base-content md:mb-0.5">
-                {testimonial.name}
-              </div>
-              {testimonial.username && (
-                <div className="mt-0.5 text-sm text-base-content/80">
-                  @{testimonial.username}
+      <Card className="relative max-w-lg h-full bg-muted border-border">
+        <CardContent className="p-6 md:p-10 max-md:text-sm flex flex-col h-full">
+          <blockquote className="relative flex-1">
+            <p className="text-muted-foreground leading-relaxed">
+              {testimonial.text}
+            </p>
+          </blockquote>
+          <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 md:gap-8 md:pt-8 md:mt-8 border-t border-border/20">
+            <div className="w-full flex items-center justify-between gap-2">
+              <div>
+                <div className="font-medium text-foreground md:mb-0.5">
+                  {testimonial.name}
                 </div>
-              )}
-            </div>
+                {testimonial.username && (
+                  <div className="mt-0.5 text-sm text-muted-foreground">
+                    @{testimonial.username}
+                  </div>
+                )}
+              </div>
 
-            <div className="overflow-hidden rounded-full bg-base-300 shrink-0">
-              {testimonial.img ? (
-                <Image
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
-                  src={list[i].img}
-                  alt={`${list[i].name}'s testimonial for ${config.appName}`}
-                  width={48}
-                  height={48}
-                />
-              ) : (
-                <span className="w-10 h-10 md:w-12 md:h-12 rounded-full flex justify-center items-center text-lg font-medium bg-base-300">
+              <Avatar className="w-10 h-10 md:w-12 md:h-12 shrink-0">
+                {testimonial.img && (
+                  <AvatarImage
+                    src={typeof testimonial.img === 'string' ? testimonial.img : testimonial.img.src}
+                    alt={`${testimonial.name}'s testimonial for ${config.appName}`}
+                  />
+                )}
+                <AvatarFallback className="bg-muted text-foreground text-lg font-medium">
                   {testimonial.name.charAt(0)}
-                </span>
-              )}
+                </AvatarFallback>
+              </Avatar>
             </div>
-          </div>
-        </figcaption>
-      </figure>
+          </figcaption>
+        </CardContent>
+      </Card>
     </li>
   );
 };
@@ -86,11 +86,11 @@ const Testimonials3 = () => {
       <div className="py-24 px-8 max-w-7xl mx-auto">
         <div className="flex flex-col text-center w-full mb-20">
           <div className="mb-8">
-            <h2 className="sm:text-5xl text-4xl font-extrabold text-base-content">
+            <h2 className="sm:text-5xl text-4xl font-extrabold text-foreground">
               212 makers are already shipping faster!
             </h2>
           </div>
-          <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-base-content/80">
+          <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-muted-foreground">
             Don&apos;t take our word for it. Here&apos;s what they have to say
             about ShipFast.
           </p>

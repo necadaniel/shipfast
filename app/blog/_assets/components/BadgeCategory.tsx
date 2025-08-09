@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import { categoryType } from "../content";
 
 // This is the category badge that appears in the article page and in <CardArticle /> component
@@ -12,13 +13,17 @@ const Category = ({
   return (
     <Link
       href={`/blog/category/${category.slug}`}
-      className={`badge badge-sm md:badge-md hover:badge-primary ${
-        extraStyle ? extraStyle : ""
-      }`}
       title={`Posts in ${category.title}`}
       rel="tag"
     >
-      {category.titleShort}
+      <Badge 
+        variant="secondary" 
+        className={`hover:bg-primary hover:text-primary-foreground transition-colors duration-200 cursor-pointer ${
+          extraStyle ? extraStyle : ""
+        }`}
+      >
+        {category.titleShort}
+      </Badge>
     </Link>
   );
 };

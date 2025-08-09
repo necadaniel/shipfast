@@ -1,6 +1,7 @@
 import type { JSX } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
 import BadgeCategory from "./BadgeCategory";
 import Avatar from "./Avatar";
 import { articleType } from "../content";
@@ -20,15 +21,15 @@ const CardArticle = ({
   const TitleTag = tag;
 
   return (
-    <article className="card bg-base-200 rounded-box overflow-hidden">
+    <Card className="bg-muted border-border overflow-hidden">
       {article.image?.src && (
         <Link
           href={`/blog/${article.slug}`}
-          className="link link-hover hover:link-primary"
+          className="block text-foreground hover:text-primary transition-colors"
           title={article.title}
           rel="bookmark"
         >
-          <figure>
+          <figure className="relative overflow-hidden">
             <Image
               src={article.image.src}
               alt={article.image.alt}
@@ -41,10 +42,11 @@ const CardArticle = ({
           </figure>
         </Link>
       )}
-      <div className="card-body">
+      
+      <CardContent className="p-6">
         {/* CATEGORIES */}
         {showCategory && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mb-4">
             {article.categories.map((category) => (
               <BadgeCategory category={category} key={category.slug} />
             ))}
@@ -52,10 +54,10 @@ const CardArticle = ({
         )}
 
         {/* TITLE WITH RIGHT TAG */}
-        <TitleTag className="mb-1 text-xl md:text-2xl font-bold">
+        <TitleTag className="mb-1 text-xl md:text-2xl font-bold text-foreground">
           <Link
             href={`/blog/${article.slug}`}
-            className="link link-hover hover:link-primary"
+            className="text-foreground hover:text-primary transition-colors underline-offset-4 hover:underline"
             title={article.title}
             rel="bookmark"
           >
@@ -63,9 +65,9 @@ const CardArticle = ({
           </Link>
         </TitleTag>
 
-        <div className=" text-base-content/80 space-y-4">
+        <div className="text-muted-foreground space-y-4">
           {/* DESCRIPTION */}
-          <p className="">{article.description}</p>
+          <p>{article.description}</p>
 
           {/* AUTHOR & DATE */}
           <div className="flex items-center gap-4 text-sm">
@@ -79,8 +81,8 @@ const CardArticle = ({
             </span>
           </div>
         </div>
-      </div>
-    </article>
+      </CardContent>
+    </Card>
   );
 };
 

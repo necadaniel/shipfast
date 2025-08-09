@@ -1,4 +1,6 @@
-import Image from "next/image";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Star } from "lucide-react";
 
 const avatars: {
   alt: string;
@@ -27,46 +29,37 @@ const avatars: {
   },
 ];
 
-const TestimonialsAvatars = ({ priority }: { priority?: boolean }) => {
+const TestimonialsAvatars = () => {
   return (
     <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-3">
       {/* AVATARS */}
-      <div className={`-space-x-5 avatar-group justy-start`}>
+      <div className="flex -space-x-5 justify-start">
         {avatars.map((image, i) => (
-          <div className="avatar w-12 h-12" key={i}>
-            <Image
+          <Avatar key={i} className="w-12 h-12 border-2 border-background">
+            <AvatarImage
               src={image.src}
               alt={image.alt}
-              priority={priority}
-              width={50}
-              height={50}
             />
-          </div>
+            <AvatarFallback className="bg-muted text-foreground">
+              {image.alt.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
         ))}
       </div>
 
       {/* RATING */}
       <div className="flex flex-col justify-center items-center md:items-start gap-1">
-        <div className="rating">
+        <div className="flex">
           {[...Array(5)].map((_, i) => (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5 text-yellow-500"
+            <Star
               key={i}
-            >
-              <path
-                fillRule="evenodd"
-                d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                clipRule="evenodd"
-              />
-            </svg>
+              className="w-5 h-5 fill-yellow-500 text-yellow-500"
+            />
           ))}
         </div>
 
-        <div className="text-base text-base-content/80">
-          <span className="font-semibold text-base-content">32</span> makers
+        <div className="text-base text-muted-foreground">
+          <span className="font-semibold text-foreground">32</span> makers
           ship faster
         </div>
       </div>

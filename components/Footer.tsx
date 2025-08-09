@@ -8,9 +8,9 @@ import logo from "@/app/icon.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-base-200 border-t border-base-content/10">
+    <footer className="bg-muted border-t border-border">
       <div className="max-w-7xl mx-auto px-8 py-24">
-        <div className=" flex lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
+        <div className="flex lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
           <div className="w-64 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
             <Link
               href="/#"
@@ -25,15 +25,15 @@ const Footer = () => {
                 width={24}
                 height={24}
               />
-              <strong className="font-extrabold tracking-tight text-base md:text-lg">
+              <strong className="font-extrabold tracking-tight text-base md:text-lg text-foreground">
                 {config.appName}
               </strong>
             </Link>
 
-            <p className="mt-3 text-sm text-base-content/80">
+            <p className="mt-3 text-sm text-muted-foreground">
               {config.appDescription}
             </p>
-            <p className="mt-3 text-sm text-base-content/60">
+            <p className="mt-3 text-sm text-muted-foreground/80">
               Copyright © {new Date().getFullYear()} - All rights reserved
             </p>
 
@@ -41,7 +41,7 @@ const Footer = () => {
               href="https://shipfa.st/?ref=shipfast_badge"
               title="Go to ShipFast"
               target="_blank"
-              className="mt-4 inline-block cursor-pointer rounded bg-neutral px-2 py-1 text-sm text-neutral-content ring-1 ring-base-content/10 duration-200 hover:ring-neutral"
+              className="mt-4 inline-block cursor-pointer rounded bg-secondary px-2 py-1 text-sm text-secondary-foreground ring-1 ring-border duration-200 hover:ring-secondary"
             >
               <div className="flex items-center gap-1">
                 <span className="opacity-90">Built with</span>
@@ -66,7 +66,7 @@ const Footer = () => {
           </div>
           <div className="flex-grow flex flex-wrap justify-center -mb-10 md:mt-0 mt-10 text-center">
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
-              <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
+              <div className="font-semibold text-foreground tracking-widest text-sm md:text-left mb-3">
                 LINKS
               </div>
 
@@ -75,34 +75,50 @@ const Footer = () => {
                   <a
                     href={`mailto:${config.resend.supportEmail}`}
                     target="_blank"
-                    className="link link-hover"
+                    className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
                     aria-label="Contact Support"
                   >
                     Support
                   </a>
                 )}
-                <Link href="/#pricing" className="link link-hover">
+                <Link 
+                  href="/#pricing" 
+                  className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                >
                   Pricing
                 </Link>
-                <Link href="/blog" className="link link-hover">
+                <Link 
+                  href="/blog" 
+                  className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                >
                   Blog
                 </Link>
-                <a href="/#" target="_blank" className="link link-hover">
+                <a 
+                  href="/#" 
+                  target="_blank" 
+                  className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                >
                   Affiliates
                 </a>
               </div>
             </div>
 
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
-              <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
+              <div className="font-semibold text-foreground tracking-widest text-sm md:text-left mb-3">
                 LEGAL
               </div>
 
               <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
-                <Link href="/tos" className="link link-hover">
+                <Link 
+                  href="/tos" 
+                  className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                >
                   Terms of services
                 </Link>
-                <Link href="/privacy-policy" className="link link-hover">
+                <Link 
+                  href="/privacy-policy" 
+                  className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                >
                   Privacy policy
                 </Link>
               </div>
