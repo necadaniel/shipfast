@@ -1,7 +1,7 @@
 # ShipFast TypeScript SaaS Boilerplate - Cursor Rules
 
 ## Project Overview
-This is a Next.js 15+ TypeScript SaaS boilerplate with Stripe payments, NextAuth authentication, MongoDB database, and modern UI components using DaisyUI/TailwindCSS.
+This is a Next.js 15+ TypeScript SaaS boilerplate with Stripe payments, NextAuth authentication, MongoDB database, and modern UI components using ShadCN-UI/TailwindCSS.
 
 ## Tech Stack & Dependencies
 - **Framework**: Next.js 15+ with App Router
@@ -9,9 +9,9 @@ This is a Next.js 15+ TypeScript SaaS boilerplate with Stripe payments, NextAuth
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: NextAuth v5 (beta) with Google OAuth and Email providers
 - **Payments**: Stripe integration with webhooks
-- **Styling**: TailwindCSS 4.1+ with DaisyUI 5.0+
+- **Styling**: TailwindCSS 4.1+ with ShadCN-UI
 - **Email**: Resend for transactional emails
-- **UI Components**: Headless UI, React Hot Toast, React Tooltip
+- **UI Components**: ShadCN-UI components, React Hot Toast, React Tooltip
 - **Blog**: MDX support for blog content
 
 ## Code Style & Conventions
@@ -29,6 +29,7 @@ This is a Next.js 15+ TypeScript SaaS boilerplate with Stripe payments, NextAuth
 - Use camelCase for functions and variables
 - API routes: `/app/api/[feature]/route.ts`
 - Components: `/components/ComponentName.tsx`
+- ShadCN components: `/components/ui/component-name.tsx`
 - Pages: `/app/[route]/page.tsx`
 - Types: `/types/[feature].ts`
 - Utils/Libs: `/libs/[utility].ts`
@@ -40,15 +41,17 @@ This is a Next.js 15+ TypeScript SaaS boilerplate with Stripe payments, NextAuth
 - Export default for main component, named exports for utilities
 - Keep components focused and single-responsibility
 - Use proper TypeScript interfaces for props
+- Leverage ShadCN component composition patterns
 
 ### Import Order
 1. React and Next.js imports
 2. Third-party libraries
-3. Internal components (components/)
-4. Internal utilities (libs/)
-5. Internal types (types/)
-6. Config and constants
-7. Relative imports
+3. ShadCN UI components (components/ui/)
+4. Internal components (components/)
+5. Internal utilities (libs/)
+6. Internal types (types/)
+7. Config and constants
+8. Relative imports
 
 ### API Routes
 - Use proper HTTP methods (GET, POST, PUT, DELETE)
@@ -92,22 +95,34 @@ This is a Next.js 15+ TypeScript SaaS boilerplate with Stripe payments, NextAuth
 - Custom theme variables defined with `--color-name`, `--spacing-name`, etc.
 - PostCSS config uses `@tailwindcss/postcss` plugin
 
-### Component Patterns
-- Use DaisyUI classes for styling: `btn`, `btn-primary`, `card`, etc.
-- Implement responsive design with Tailwind breakpoints
-- Use proper semantic HTML elements
-- Include proper accessibility attributes
+### Color System & Design Tokens
+- Use CSS custom properties defined in `globals.css` for colors
+- Reference design system colors like `hsl(var(--primary))`, `hsl(var(--secondary))`
+- Follow ShadCN color conventions: `--background`, `--foreground`, `--card`, `--card-foreground`, `--popover`, `--popover-foreground`, `--primary`, `--primary-foreground`, `--secondary`, `--secondary-foreground`, `--muted`, `--muted-foreground`, `--accent`, `--accent-foreground`, `--destructive`, `--destructive-foreground`, `--border`, `--input`, `--ring`
+- Use semantic color names from the design system rather than arbitrary values
+- Implement dark mode using CSS custom properties with `[data-theme="dark"]` selectors
+
+### ShadCN Component Patterns
+- Use ShadCN components from `/components/ui/`: Button, Card, Input, Label, Select, Dialog, etc.
+- Follow ShadCN composition patterns for complex components
+- Use `cn()` utility for conditional className merging
+- Import components from `@/components/ui/component-name`
+- Customize ShadCN components through CSS variables in globals.css
+- Use proper variant patterns for component customization
 
 ### Button Components
-- Follow the pattern of existing buttons like `ButtonCheckout`, `ButtonSignin`
-- Use proper loading states
+- Use ShadCN Button component with proper variants: `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`
+- Use proper sizes: `default`, `sm`, `lg`, `icon`
+- Handle loading states with disabled prop and loading spinner
 - Handle async operations properly
 - Include proper error handling with toast notifications
+- Example: `<Button variant="default" size="lg" disabled={isLoading}>Submit</Button>`
 
 ### Layout Pattern
 - Use the `LayoutClient` wrapper for client-side providers
 - Include proper SEO meta tags using the `/libs/seo.tsx` helper
 - Use proper font loading and optimization
+- Use ShadCN components for layout elements when appropriate
 
 ### Blog Pattern
 - Use MDX for blog content in `/app/blog/_assets/`
@@ -134,6 +149,7 @@ Always use proper environment variable patterns:
 - Implement proper lazy loading
 - Use proper caching strategies
 - Optimize bundle size with proper imports
+- Use ShadCN's tree-shakeable component architecture
 
 ## Security
 - Validate all inputs
@@ -165,7 +181,10 @@ Use Conventional Commits format:
 - Don't hardcode configuration values
 - Don't forget to validate user inputs
 - Don't skip error handling in async operations
-- Don't use inline styles, prefer TailwindCSS classes
+- Don't use inline styles, prefer TailwindCSS classes with ShadCN components
 - Don't create components without proper TypeScript interfaces
 - Don't forget to connect to MongoDB in API routes
-- Don't skip webhook signature verification for Stripe 
+- Don't skip webhook signature verification for Stripe
+- Don't bypass ShadCN component patterns - use proper composition
+- Don't hardcode colors - use CSS custom properties from globals.css
+- Don't create custom UI components when ShadCN alternatives exist

@@ -1,9 +1,9 @@
 import { ConfigProps } from "./types/config";
 
-// DaisyUI v5 no longer exports themes directly, using fallback color
+// Theme colors from globals.css
 const themes = {
   light: {
-    primary: "#3b82f6", // blue-500
+    primary: "oklch(0.205 0 0)", // --primary from globals.css
   }
 };
 
@@ -86,11 +86,9 @@ const config = {
     supportEmail: "marc.louvion@gmail.com",
   },
   colors: {
-    // REQUIRED — The DaisyUI theme to use (added to the main layout.js). Leave blank for default (light & dark mode). If you use any theme other than light/dark, you need to add it in config.tailwind.js in daisyui.themes.
-    theme: "light",
-    // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..). By default it takes the primary color from your DaisyUI theme (make sure to update your the theme name after "data-theme=")
-    // OR you can just do this to use a custom color: main: "#f37055". HEX only.
-    main: themes["light"]["primary"],
+    // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..)
+    // Using the primary color from globals.css converted to HEX for browser compatibility
+    main: "#343434", // Converted from oklch(0.205 0 0) to HEX
   },
   auth: {
     // REQUIRED — the path to log in users. It's use to protect private routes (like /dashboard). It's used in apiClient (/libs/api.js) upon 401 errors from our API
