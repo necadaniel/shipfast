@@ -79,11 +79,11 @@ const config = {
   },
   resend: {
     // REQUIRED — Email 'From' field to be used when sending magic login links
-    fromNoReply: `ShipFast <noreply@resend.shipfa.st>`,
+    fromNoReply: `Daniel <noreply@resend.shipfa.st>`,
     // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
-    fromAdmin: `Marc at ShipFast <marc@resend.shipfa.st>`,
+    fromAdmin: `Daniel at ShipFast <daniel@resend.shipfa.st>`,
     // Email shown to customer if they need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
-    supportEmail: "marc.louvion@gmail.com",
+    supportEmail: "neca.daniel@icloud.com",
   },
   colors: {
     // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..)
