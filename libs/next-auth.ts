@@ -13,7 +13,7 @@ export const authOptions = {
       // Follow the "Login with Google" tutorial to get your credentials
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
-      profile(profile) {
+      async profile(profile) {
         return {
           id: profile.sub,
           name: profile.given_name ? profile.given_name : profile.name,
@@ -47,9 +47,17 @@ export const authOptions = {
   ...(connectMongo && { adapter: MongoDBAdapter(connectMongo) }),
 
   callbacks: {
+    jwt: async ({ token, user, account, profile }: any) => {
+      // On sign in, attach the MongoDB user ID to the token
+      if (user) {
+        token.id = user.id || user._id;
+      }
+      return token;
+    },
     session: async ({ session, token }: any) => {
       if (session?.user) {
-        session.user.id = token.sub;
+        // Use the MongoDB user ID from the token
+        session.user.id = token.id || token.sub;
       }
       return session;
     },

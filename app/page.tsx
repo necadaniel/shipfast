@@ -1,11 +1,22 @@
+import CTA from "@/components/CTA";
+import FeaturesGrid from "@/components/FeaturesGrid";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import Hero from "@/components/Hero";
+import Pricing from "@/components/Pricing";
+import Problem from "@/components/Problem";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Page() {
   return (
     <div>
-      <div className="flex justify-end p-4">
-        <ThemeToggle />
-      </div>
+      <Header />
+      <Hero />
+      <Problem />
+      <FeaturesGrid />
+      <Pricing />
+      <CTA />
+      <Footer />
     </div>
   );
 }

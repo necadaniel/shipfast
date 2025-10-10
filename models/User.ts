@@ -36,6 +36,12 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Master encryption key for user's environment variables (base64 encoded)
+    // This is generated once per user and used to encrypt all their secrets
+    encryptionKey: {
+      type: String,
+      private: true, // Don't expose in API responses
+    },
   },
   {
     timestamps: true,
