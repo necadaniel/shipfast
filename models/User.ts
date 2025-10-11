@@ -42,6 +42,24 @@ const userSchema = new mongoose.Schema(
       type: String,
       private: true, // Don't expose in API responses
     },
+    // User's subscription plan
+    plan: {
+      type: String,
+      enum: ["solo", "team"],
+      default: "solo",
+    },
+    // Reference to team if user is part of one
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
+      default: null,
+    },
+    // User's role within the team
+    teamRole: {
+      type: String,
+      enum: ["owner", "admin", "member", "viewer"],
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -52,4 +70,5 @@ const userSchema = new mongoose.Schema(
 // add plugin that converts mongoose to json
 userSchema.plugin(toJSON);
 
-export default (mongoose.models.User || mongoose.model("User", userSchema)) as mongoose.Model<any>;
+export default (mongoose.models.User ||
+  mongoose.model("User", userSchema)) as mongoose.Model<any>;

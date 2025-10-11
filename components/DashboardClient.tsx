@@ -166,21 +166,21 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
 
   return (
     <>
-      <div className="p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">
               Projects
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Manage your environment variables across all your projects
             </p>
           </div>
           {projects.length > 0 && (
             <Button
               onClick={() => setIsCreateModalOpen(true)}
-              className="gap-2 shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_4px_16px_rgba(0,0,0,0.15)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_6px_20px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all"
+              className="gap-2 shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_4px_16px_rgba(0,0,0,0.15)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_6px_20px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all w-full sm:w-auto"
             >
               <Plus className="w-4 h-4" />
               New Project
@@ -190,26 +190,26 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
 
         {/* Empty State */}
         {projects.length === 0 && (
-          <div className="flex items-center justify-center min-h-[calc(100vh-12rem)]">
+          <div className="flex items-center justify-center min-h-[calc(100vh-12rem)] px-4">
             <div className="max-w-md w-full">
               {/* Empty State Card */}
-              <div className="relative rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 p-8 lg:p-12 text-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.08)]">
+              <div className="relative rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 p-6 sm:p-8 lg:p-12 text-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.08)]">
                 {/* Decorative gradient orb */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 sm:w-32 h-24 sm:h-32 bg-primary/20 rounded-full blur-3xl" />
 
                 <div className="relative">
                   {/* Icon */}
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_16px_rgba(0,0,0,0.1)]">
-                    <FolderPlus className="w-8 h-8 text-primary" />
+                  <div className="inline-flex items-center justify-center w-14 sm:w-16 h-14 sm:h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 mb-4 sm:mb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_16px_rgba(0,0,0,0.1)]">
+                    <FolderPlus className="w-7 sm:w-8 h-7 sm:h-8 text-primary" />
                   </div>
 
                   {/* Heading */}
-                  <h2 className="text-2xl font-bold text-foreground mb-3">
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2 sm:mb-3">
                     Create Your First Project
                   </h2>
 
                   {/* Description */}
-                  <p className="text-muted-foreground mb-8 leading-relaxed">
+                  <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
                     Start by creating a project to organize and sync your
                     environment variables securely across all your devices.
                   </p>
@@ -255,14 +255,14 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
 
         {/* Projects Grid */}
         {projects.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {projects.map((project) => (
               <Link
                 key={project._id}
                 href={`/dashboard/project/${project._id}`}
                 className="group h-full"
               >
-                <div className="relative rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-6 transition-all hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_12px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-2px] shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.08)] cursor-pointer h-full flex flex-col">
+                <div className="relative rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 sm:p-6 transition-all hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_12px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-2px] shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.08)] active:scale-[0.98] cursor-pointer h-full flex flex-col">
                   {/* Color indicator */}
                   <div
                     className="absolute top-0 left-0 w-1 h-full rounded-l-xl"
@@ -270,19 +270,19 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
                   />
 
                   {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                       <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)]"
+                        className="w-9 sm:w-10 h-9 sm:h-10 rounded-lg flex items-center justify-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)] flex-shrink-0"
                         style={{ backgroundColor: `${project.color}20` }}
                       >
                         <FolderOpen
-                          className="w-5 h-5"
+                          className="w-4 sm:w-5 h-4 sm:h-5"
                           style={{ color: project.color }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                        <h3 className="text-sm sm:text-base font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                           {project.name}
                         </h3>
                       </div>
@@ -294,7 +294,7 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
                             e.preventDefault();
                             e.stopPropagation();
                           }}
-                          className="p-1.5 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                          className="p-1.5 sm:p-2 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -363,22 +363,22 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
                   </div>
 
                   {/* Description */}
-                  <div className="flex-1 mb-4">
+                  <div className="flex-1 mb-3 sm:mb-4">
                     {project.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                         {project.description}
                       </p>
                     )}
                   </div>
 
                   {/* Stats */}
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center flex-wrap gap-3 sm:gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1.5">
-                      <Key className="w-3.5 h-3.5" />
+                      <Key className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                       <span>{project.variableCount} variables</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5" />
+                      <Calendar className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                       <span>{formatDate(project.createdAt)}</span>
                     </div>
                   </div>
@@ -389,15 +389,15 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
             {/* Add New Project Card */}
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="group rounded-xl border-2 border-dashed border-primary/30 p-6 hover:border-primary/50 hover:bg-primary/5 transition-all flex flex-col items-center justify-center text-center h-full"
+              className="group rounded-xl border-2 border-dashed border-primary/30 p-6 hover:border-primary/50 hover:bg-primary/5 active:scale-[0.98] transition-all flex flex-col items-center justify-center text-center h-full min-h-[160px] sm:min-h-[180px]"
             >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
-                <FolderPlus className="w-6 h-6 text-primary" />
+              <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/20 transition-colors">
+                <FolderPlus className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
               </div>
-              <p className="font-medium text-foreground mb-1">
+              <p className="text-sm sm:text-base font-medium text-foreground mb-1">
                 Create New Project
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Add another project to manage
               </p>
             </button>

@@ -16,6 +16,7 @@ import {
   FileText,
   Loader2,
   Lock,
+  Clipboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -263,6 +264,20 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => {
+                  const envContent = variables
+                    .map((v) => `${v.key}=${v.value}`)
+                    .join("\n");
+                  copyToClipboard(envContent);
+                }}
+                disabled={variables.length === 0}
+              >
+                <Clipboard className="w-4 h-4 mr-2" />
+                Copy All
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleDownload}
                 disabled={variables.length === 0}
               >
@@ -405,7 +420,19 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
         projectId={project.id}
         existingKeys={variables.map((v) => v.key)}
         onSuccess={(newVariable: Variable) => {
-          setVariables([...variables, newVariable]);
+          // Check if variable already exists (overwrite case)
+          const existingIndex = variables.findIndex(
+            (v) => v.key === newVariable.key
+          );
+          if (existingIndex !== -1) {
+            // Update existing variable
+            const updatedVariables = [...variables];
+            updatedVariables[existingIndex] = newVariable;
+            setVariables(updatedVariables);
+          } else {
+            // Add new variable
+            setVariables([...variables, newVariable]);
+          }
           router.refresh();
         }}
       />

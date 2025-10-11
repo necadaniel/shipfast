@@ -39,6 +39,7 @@ export default function AddVariableModal({
     value: "",
   });
   const [error, setError] = useState("");
+  const [overwriteExisting, setOverwriteExisting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,8 +52,11 @@ export default function AddVariableModal({
     }
 
     // Check for duplicate keys
-    if (existingKeys.includes(formData.key)) {
-      setError("A variable with this name already exists");
+    const isDuplicate = existingKeys.includes(formData.key);
+    if (isDuplicate && !overwriteExisting) {
+      setError(
+        "A variable with this name already exists. Enable 'Overwrite existing' to update it."
+      );
       return;
     }
 
@@ -77,6 +81,13 @@ export default function AddVariableModal({
     setIsLoading(true);
 
     try {
+      // If overwriting, delete the existing variable first
+      if (isDuplicate && overwriteExisting) {
+        await apiClient.delete(
+          `/projects/${projectId}/variables/${formData.key}`
+        );
+      }
+
       // Encrypt the value before sending to server
       const encryptedValue = await encryptValue(formData.value, encryptionKey);
 
@@ -91,8 +102,13 @@ export default function AddVariableModal({
 
       // Return decrypted value to parent component
       onSuccess({ key: formData.key, value: formData.value });
-      toast.success(`Variable "${formData.key}" added successfully!`);
+      toast.success(
+        isDuplicate
+          ? `Variable "${formData.key}" updated successfully!`
+          : `Variable "${formData.key}" added successfully!`
+      );
       setFormData({ key: "", value: "" });
+      setOverwriteExisting(false);
       onOpenChange(false);
     } catch (error: any) {
       console.error("Error adding variable:", error);
@@ -112,9 +128,12 @@ export default function AddVariableModal({
       if (!newOpen) {
         setFormData({ key: "", value: "" });
         setError("");
+        setOverwriteExisting(false);
       }
     }
   };
+
+  const isDuplicate = existingKeys.includes(formData.key);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -163,6 +182,25 @@ export default function AddVariableModal({
             />
           </div>
 
+          {/* Overwrite Toggle */}
+          {isDuplicate && (
+            <div className="flex items-center gap-2 py-2 px-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+              <input
+                type="checkbox"
+                id="overwrite-existing"
+                checked={overwriteExisting}
+                onChange={(e) => setOverwriteExisting(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+              />
+              <label
+                htmlFor="overwrite-existing"
+                className="text-sm cursor-pointer select-none text-orange-600 dark:text-orange-400 font-medium"
+              >
+                Overwrite existing variable
+              </label>
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
             <div className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
@@ -182,7 +220,9 @@ export default function AddVariableModal({
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Add Variable
+              {isDuplicate && overwriteExisting
+                ? "Update Variable"
+                : "Add Variable"}
             </Button>
           </div>
         </form>

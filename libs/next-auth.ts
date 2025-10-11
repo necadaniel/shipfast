@@ -62,6 +62,57 @@ export const authOptions = {
       return session;
     },
   },
+  events: {
+    createUser: async ({ user }: any) => {
+      try {
+        console.log("=== CREATE USER EVENT FIRED ===");
+        console.log("User ID:", user.id);
+        console.log("User email:", user.email);
+
+        // Import dependencies
+        const crypto = await import("crypto");
+        const connectMongoose = (await import("./mongoose")).default;
+
+        // Ensure MongoDB connection is established
+        console.log("Connecting to MongoDB...");
+        await connectMongoose();
+        console.log("MongoDB connected");
+
+        const User = (await import("@/models/User")).default;
+
+        // Generate encryption key immediately on signup
+        const encryptionKey = crypto.randomBytes(32).toString("base64");
+        console.log("Generated encryption key length:", encryptionKey.length);
+
+        // Use $set to ensure fields are added
+        const result = await User.findByIdAndUpdate(
+          user.id,
+          {
+            $set: {
+              hasAccess: false,
+              plan: "solo",
+              teamId: null,
+              teamRole: null,
+              encryptionKey: encryptionKey,
+              customerId: null,
+              priceId: null,
+            },
+          },
+          { new: true }
+        );
+
+        console.log("Update result:", result ? "Success" : "Failed");
+        if (result) {
+          console.log("User has encryptionKey:", !!result.encryptionKey);
+        }
+        console.log("=== END CREATE USER EVENT ===");
+      } catch (error) {
+        console.error("=== CREATE USER EVENT ERROR ===");
+        console.error(error);
+        console.error("=== END ERROR ===");
+      }
+    },
+  },
   session: {
     strategy: "jwt" as const,
   },

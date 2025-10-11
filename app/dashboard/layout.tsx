@@ -24,7 +24,7 @@ export default async function LayoutPrivate({
       <DashboardSidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto lg:ml-64">
+      <main className="flex-1 overflow-y-auto lg:ml-64 pt-16 lg:pt-0">
         <div className="min-h-full">{children}</div>
       </main>
     </div>

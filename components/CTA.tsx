@@ -70,7 +70,7 @@ const CTA = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button
                   size="lg"
-                  className="bg-white text-primary hover:bg-white/90 shadow-[0_1px_0_0_rgba(255,255,255,0.5)_inset,0_4px_16px_rgba(0,0,0,0.15)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.5)_inset,0_6px_20px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all duration-200 group px-8"
+                  
                 >
                   Get Started Now
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
