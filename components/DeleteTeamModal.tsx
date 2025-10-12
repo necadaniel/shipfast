@@ -46,7 +46,7 @@ export default function DeleteTeamModal({
       await apiClient.delete(`/team/${teamId}`);
       toast.success(`Team "${teamName}" deleted successfully!`);
       onOpenChange(false);
-      
+
       // Call onSuccess callback if provided (for TeamsListClient)
       if (onSuccess) {
         onSuccess();
@@ -54,7 +54,7 @@ export default function DeleteTeamModal({
         // Otherwise redirect to teams list (for TeamDetailClient)
         router.push("/dashboard/team");
       }
-      
+
       router.refresh();
     } catch (error: any) {
       console.error("Error deleting team:", error);

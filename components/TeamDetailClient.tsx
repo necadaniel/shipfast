@@ -754,10 +754,7 @@ export default function TeamDetailClient({
                     action cannot be undone.
                   </p>
                 </div>
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteTeam}
-                >
+                <Button variant="destructive" onClick={handleDeleteTeam}>
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete Team
                 </Button>
