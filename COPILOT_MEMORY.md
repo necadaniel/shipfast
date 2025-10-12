@@ -1,6 +1,6 @@
 # EnvSync - Copilot Memory & Project Knowledge Base
 
-**Last Updated:** October 10, 2025
+**Last Updated:** October 12, 2025
 
 ---
 
@@ -72,6 +72,13 @@ Based on workspace structure:
 
 - **NextAuth.js** - Authentication (`libs/next-auth.ts`)
 - **Stripe** - Payment processing (`libs/stripe.ts`)
+  - One-time payment model (not subscription)
+  - Two plans: Solo Developer ($29) and Team ($79)
+  - Plan upgrade/downgrade logic:
+    - Free users can purchase any plan
+    - Solo users can upgrade to Team but cannot re-purchase Solo
+    - Team users cannot purchase anything (highest tier)
+    - Downgrade from Team to Solo requires contacting support
 
 ### Database
 
@@ -93,10 +100,16 @@ Based on workspace structure:
 
 - `/api/auth/[...nextauth]` - Authentication
 - `/api/lead` - Lead generation
-- `/api/stripe/create-checkout` - Checkout sessions
+- `/api/stripe/create-checkout` - Checkout sessions (with plan validation)
 - `/api/stripe/create-portal` - Customer portal
 - `/api/webhook/stripe` - Stripe webhooks
-- `/api/projects` - NEW: GET (list projects), POST (create project)
+- `/api/projects` - GET (list projects), POST (create project)
+- `/api/projects/[id]` - GET, PATCH, DELETE (single project)
+- `/api/projects/[id]/variables` - GET, POST (manage variables)
+- `/api/user/plan` - GET (fetch user's current plan)
+- `/api/team` - GET (list all teams user has access to), POST (create team)
+- `/api/team/[id]` - GET (team details), PATCH (update), DELETE (delete team)
+- `/api/encryption/key` - GET (fetch/generate user's encryption key)
 
 ---
 
@@ -113,7 +126,7 @@ Based on workspace structure:
 
 - **Marketing**: Hero, CTA, Features (Grid/Listicle/Accordion), Pricing, Testimonials, FAQ
 - **Auth**: ButtonSignin, ButtonAccount
-- **Payments**: ButtonCheckout
+- **Payments**: ButtonCheckout (with authentication check and plan validation)
 - **UI**: Modal, Tabs, Popover, various shadcn/ui components
 
 ---
@@ -286,7 +299,14 @@ Based on integrations:
 
 - Next.js app structure with App Router
 - Authentication system (NextAuth)
-- Payment integration (Stripe)
+- **Payment integration (Stripe)** with plan validation:
+  - Requires authentication before checkout
+  - Redirects to sign-in with callback URL if not authenticated
+  - Automatically proceeds to checkout after login
+  - Enforces plan upgrade/downgrade rules
+  - Shows "Current Plan" button for owned plans
+  - Shows "Upgrade" button for Solo → Team upgrades
+  - Displays error toasts for invalid purchase attempts
 - Basic marketing pages
 - UI component library
 - Database models for users and leads
@@ -516,16 +536,103 @@ Based on integrations:
 - CLI tool (TO BUILD)
 - Real-time sync infrastructure (TO BUILD)
 - Version control system (TO BUILD)
-- Team collaboration features (IN PROGRESS - Phase 1 Complete)
+- Team collaboration features (IN PROGRESS - Phase 2)
   - ✅ Team Model created with members, invitations, billing status
   - ✅ User Model updated with plan, teamId, teamRole fields
-  - ✅ Team API routes (GET, POST, PATCH, DELETE)
-  - ✅ Team page with access control
-  - ✅ Team creation UI with empty state
+  - ✅ Team API routes (GET list, POST create, GET/PATCH/DELETE individual)
+  - ✅ **Team list page** - `/dashboard/team` - Shows all teams user owns/is member of
+  - ✅ **Team detail page** - `/dashboard/team/[id]` - Individual team management
+  - ✅ **TeamsListClient component** - Grid view of teams with create/delete actions
+  - ✅ **TeamDetailClient component** - Tabbed interface with:
+    - **Members Tab** - Team members list, roles, pending invitations
+    - **Projects Tab** - Placeholder for shared team projects (coming soon)
+    - **Settings Tab** - Team name editor, danger zone (delete team - owner only)
   - ✅ Database migration scripts for schema updates
-  - [ ] Invitation system (email + magic link) - NEXT
-  - [ ] Accept invitation flow - NEXT
-  - [ ] Team members UI - NEXT
+  - ✅ Multiple teams support - Users with Team plan can create multiple teams
+  - ✅ Access control - Only team owners/members can view team details
+  - ✅ Update team name - Owners can rename their teams
+  - ✅ Delete team - Owners can delete teams with double confirmation
+  - ✅ **Invitation system** (COMPLETED):
+    - **POST /api/team/[id]/invite** - Send email invitation via Resend
+    - **InviteMemberModal component** - Owner/admin can invite by email
+    - 24-hour expiration on invitation links
+    - Role selection: Viewer, Member, Admin
+    - Beautiful HTML email template with branded styling
+    - Email validation and duplicate checking
+  - ✅ **Accept invitation flow** (COMPLETED):
+    - **GET /api/invite/[token]** - Fetch invitation details
+    - **POST /api/invite/[token]/accept** - Accept invitation
+    - **/invite/[token]** page - Public invitation acceptance page
+    - **InviteClient component** - Beautiful invitation UI with:
+      - Team preview with member count
+      - Inviter information with avatar
+      - Role badge display
+      - Time remaining countdown
+      - Email mismatch detection and warning
+      - Sign in / Create account flow
+      - Auto-redirect to /dashboard/team after acceptance
+      - Success toast notification on join
+    - Authentication handling:
+      - Unauthenticated users: "Create Account" or "Sign In" buttons
+      - Wrong email: Warning message with "Sign in with correct email" button
+      - Correct email: "Accept Invitation" button
+    - SessionStorage persistence for post-auth redirect
+    - Members added with role from invitation
+    - **Auto-wraps team encryption key for new members**
+  - ✅ **Team Encryption Architecture** (COMPLETED):
+    - Hybrid encryption with key wrapping pattern (industry standard)
+    - Flow: User Personal Key → Wrapped Team Key → Team Master Key → Project Variables
+    - Team Model updated with `teamEncryptionKey` (select: false) and `wrappedTeamKeys` array
+    - New encryption functions in `/libs/encryption.ts`:
+      - `generateTeamEncryptionKey()` - Generate team master key
+      - `wrapTeamKey(teamKey, personalKey)` - Wrap team key with personal key
+      - `unwrapTeamKey(wrappedKey, personalKey)` - Unwrap team key
+      - `encryptWithTeamKey()` and `decryptWithTeamKey()` - Team value encryption
+      - `decryptTeamValue()` - Two-layer decryption helper
+    - **GET /api/team/[id]/encryption-key** - Fetch wrapped team key for user:
+      - Auto-generates team key on first request
+      - Auto-wraps key for requesting user
+      - Returns existing wrapped key if available
+    - **useTeamEncryption hook** (`/hooks/useTeamEncryption.ts`):
+      - Auto-fetches wrapped key from API
+      - Auto-unwraps with personal key
+      - In-memory caching per session
+      - `clearTeamKeyCache()` helper for logout
+    - Security benefits:
+      - Zero-knowledge maintained (server never sees plaintext)
+      - Efficient (one encryption per variable)
+      - Secure (requires personal key to unwrap)
+      - Scalable (easy to add/remove members)
+      - Revocable (remove wrapped key = instant access loss)
+  - ✅ **Team Projects** (COMPLETED):
+    - Project Model updated to support team projects:
+      - `userId` - Optional (for personal projects)
+      - `teamId` - Optional (for team projects)
+      - `isTeamProject` - Boolean flag
+      - Validation: either userId or teamId must be present
+      - New index: `{ teamId: 1, createdAt: -1 }`
+    - **GET /api/team/[id]/projects** - List team projects:
+      - Access control: owner or member only
+      - Returns all team projects sorted by creation date
+    - **POST /api/team/[id]/projects** - Create team project:
+      - Permission: owner and admin only
+      - Creates project with `isTeamProject: true` and `teamId`
+    - Team Projects tab in TeamDetailClient:
+      - Grid view with project cards
+      - "New Project" button (owner/admin only)
+      - Empty state with call-to-action
+      - Loading state during fetch
+      - Team badge on project cards
+      - Auto-fetches when tab is active
+    - CreateProjectModal updated:
+      - Props: `teamId`, `isTeamProject`, `onProjectCreated`
+      - Dynamic API endpoint based on project type
+      - Optional callback instead of router.refresh
+  - [ ] Team variable encryption/decryption in project detail - NEXT
+  - [ ] Role management (change member roles) - Future
+  - [ ] Remove members functionality - Future
+  - [ ] Cancel pending invitations - Future
+  - [ ] Share existing personal project with team - Future
 - **Landing Page Components (COMPLETED)**
   - ✅ Header
   - ✅ Hero section
@@ -573,12 +680,13 @@ Bottom:
 
 **Pages to Build:**
 
-1. `/dashboard` - Projects list (grid/table)
-2. `/dashboard/project/[id]` - Project detail & .env editor
-3. `/dashboard/devices` - Device management
-4. `/dashboard/team` - Team & permissions
-5. `/dashboard/history` - Version history
-6. `/dashboard/settings` - Account settings
+1. ✅ `/dashboard` - Projects list (grid/table)
+2. ✅ `/dashboard/project/[id]` - Project detail & .env editor
+3. `/dashboard/devices` - Device management (TO BUILD)
+4. ✅ `/dashboard/team` - Teams list (grid view)
+5. ✅ `/dashboard/team/[id]` - Team detail & member management
+6. `/dashboard/history` - Version history (TO BUILD)
+7. `/dashboard/settings` - Account settings (TO BUILD)
 
 ---
 

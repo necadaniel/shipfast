@@ -4,7 +4,7 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import Team from "@/models/Team";
 
-// GET /api/team - Get user's team details
+// GET /api/team - Get all teams user has access to (owns or is member of)
 export async function GET(req: Request) {
   try {
     const session = await auth();
@@ -24,25 +24,40 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user has a team
-    if (!user.teamId) {
-      return NextResponse.json({ team: null }, { status: 200 });
-    }
+    // Find all teams where user is owner OR a member
+    const teams = await Team.find({
+      $or: [{ ownerId: user._id }, { "members.userId": user._id }],
+    })
+      .select("name ownerId members memberCount createdAt updatedAt")
+      .sort({ createdAt: -1 });
 
-    // Fetch team details
-    const team = await Team.findById(user.teamId)
-      .populate("ownerId", "name email image")
-      .populate("members.userId", "name email image");
+    // Add user's role to each team for display
+    const teamsWithRole = teams.map((team) => {
+      const teamObj = team.toObject();
+      let role = "member";
 
-    if (!team) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
-    }
+      if (team.ownerId.toString() === user._id.toString()) {
+        role = "owner";
+      } else {
+        const member = team.members.find(
+          (m: any) => m.userId.toString() === user._id.toString()
+        );
+        if (member) {
+          role = member.role;
+        }
+      }
 
-    return NextResponse.json({ team }, { status: 200 });
+      return {
+        ...teamObj,
+        userRole: role,
+      };
+    });
+
+    return NextResponse.json({ teams: teamsWithRole }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching team:", error);
+    console.error("Error fetching teams:", error);
     return NextResponse.json(
-      { error: "Failed to fetch team" },
+      { error: "Failed to fetch teams" },
       { status: 500 }
     );
   }
@@ -67,7 +82,9 @@ export async function POST(req: Request) {
 
     console.log("Looking up user with ID:", session.user.id);
     // Fetch user with explicit select to ensure we get the plan field
-    const user = await User.findById(session.user.id).select('+plan +teamId +teamRole');
+    const user = await User.findById(session.user.id).select(
+      "+plan +teamId +teamRole"
+    );
 
     console.log("User found:", !!user);
     if (!user) {
@@ -93,16 +110,11 @@ export async function POST(req: Request) {
         planIsUndefined: user.plan === undefined,
       });
       return NextResponse.json(
-        { error: "Team plan required to create a team. Please upgrade your plan." },
+        {
+          error:
+            "Team plan required to create a team. Please upgrade your plan.",
+        },
         { status: 403 }
-      );
-    }
-
-    // Check if user already has a team
-    if (user.teamId) {
-      return NextResponse.json(
-        { error: "User already belongs to a team" },
-        { status: 400 }
       );
     }
 
@@ -115,7 +127,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create team
+    // Create team (users with Team plan can create multiple teams)
     const team = await Team.create({
       name: name.trim(),
       ownerId: user._id,
@@ -123,10 +135,8 @@ export async function POST(req: Request) {
       pendingInvitations: [],
     });
 
-    // Update user with team info
-    user.teamId = team._id;
-    user.teamRole = "owner";
-    await user.save();
+    // Note: We don't update user.teamId anymore since users can have multiple teams
+    // The teamId field in User model will be deprecated in favor of the Team.members array
 
     return NextResponse.json(
       { team, message: "Team created successfully" },

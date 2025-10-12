@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import apiClient from "@/libs/api";
 import { useEncryption } from "@/hooks/useEncryption";
+import { useTeamEncryption } from "@/hooks/useTeamEncryption";
 import { encryptValue } from "@/libs/encryption";
 
 interface UploadEnvModalProps {
@@ -21,6 +22,8 @@ interface UploadEnvModalProps {
   projectId: string;
   existingKeys: string[];
   onSuccess: (variables: { key: string; value: string }[]) => void;
+  isTeamProject?: boolean;
+  teamId?: string | null;
 }
 
 export default function UploadEnvModal({
@@ -29,8 +32,20 @@ export default function UploadEnvModal({
   projectId,
   existingKeys,
   onSuccess,
+  isTeamProject = false,
+  teamId = null,
 }: UploadEnvModalProps) {
-  const { encryptionKey } = useEncryption();
+  // Personal encryption
+  const { encryptionKey: personalKey } = useEncryption();
+
+  // Team encryption (only if team project)
+  const { teamKey } = useTeamEncryption(
+    isTeamProject && teamId ? teamId : "",
+    personalKey
+  );
+
+  // Use appropriate encryption key
+  const encryptionKey = isTeamProject ? teamKey : personalKey;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState<{ key: string; value: string }[]>([]);

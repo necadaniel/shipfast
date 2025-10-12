@@ -90,7 +90,7 @@ export const authOptions = {
           {
             $set: {
               hasAccess: false,
-              plan: "solo",
+              plan: "free", // New users start with free plan
               teamId: null,
               teamRole: null,
               encryptionKey: encryptionKey,

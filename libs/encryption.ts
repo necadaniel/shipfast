@@ -239,3 +239,75 @@ export async function initializeEncryption(): Promise<string> {
   setEncryptionKeyInSession(masterKey);
   return masterKey;
 }
+
+// ============================================================================
+// TEAM ENCRYPTION FUNCTIONS
+// ============================================================================
+
+/**
+ * Generate a team master encryption key
+ * This key will be wrapped with each member's personal key
+ */
+export async function generateTeamEncryptionKey(): Promise<string> {
+  return generateEncryptionKey();
+}
+
+/**
+ * Wrap (encrypt) the team key with a user's personal encryption key
+ * This allows the user to decrypt the team key using their personal key
+ */
+export async function wrapTeamKey(
+  teamKey: string,
+  personalKey: string
+): Promise<string> {
+  return encryptValue(teamKey, personalKey);
+}
+
+/**
+ * Unwrap (decrypt) the team key using a user's personal encryption key
+ * Returns the team's master key that can be used to decrypt team variables
+ */
+export async function unwrapTeamKey(
+  wrappedKey: string,
+  personalKey: string
+): Promise<string> {
+  return decryptValue(wrappedKey, personalKey);
+}
+
+/**
+ * Encrypt a value with the team's encryption key
+ * Same as encryptValue but semantically named for team context
+ */
+export async function encryptWithTeamKey(
+  value: string,
+  teamKey: string
+): Promise<string> {
+  return encryptValue(value, teamKey);
+}
+
+/**
+ * Decrypt a value with the team's encryption key
+ * Same as decryptValue but semantically named for team context
+ */
+export async function decryptWithTeamKey(
+  encryptedValue: string,
+  teamKey: string
+): Promise<string> {
+  return decryptValue(encryptedValue, teamKey);
+}
+
+/**
+ * Two-layer decryption: Unwrap team key, then decrypt value
+ * This is the main function for team members to access team variables
+ */
+export async function decryptTeamValue(
+  encryptedValue: string,
+  wrappedTeamKey: string,
+  personalKey: string
+): Promise<string> {
+  // Step 1: Unwrap team key using personal key
+  const teamKey = await unwrapTeamKey(wrappedTeamKey, personalKey);
+
+  // Step 2: Decrypt value using team key
+  return decryptWithTeamKey(encryptedValue, teamKey);
+}

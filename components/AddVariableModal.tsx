@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import apiClient from "@/libs/api";
 import { useEncryption } from "@/hooks/useEncryption";
+import { useTeamEncryption } from "@/hooks/useTeamEncryption";
 import { encryptValue } from "@/libs/encryption";
 
 interface AddVariableModalProps {
@@ -23,6 +24,8 @@ interface AddVariableModalProps {
   projectId: string;
   existingKeys: string[];
   onSuccess: (variable: { key: string; value: string }) => void;
+  isTeamProject?: boolean;
+  teamId?: string | null;
 }
 
 export default function AddVariableModal({
@@ -31,8 +34,20 @@ export default function AddVariableModal({
   projectId,
   existingKeys,
   onSuccess,
+  isTeamProject = false,
+  teamId = null,
 }: AddVariableModalProps) {
-  const { encryptionKey } = useEncryption();
+  // Personal encryption
+  const { encryptionKey: personalKey } = useEncryption();
+
+  // Team encryption (only if team project)
+  const { teamKey } = useTeamEncryption(
+    isTeamProject && teamId ? teamId : "",
+    personalKey
+  );
+
+  // Use appropriate encryption key
+  const encryptionKey = isTeamProject ? teamKey : personalKey;
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     key: "",

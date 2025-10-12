@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import Project from "@/models/Project";
+import User from "@/models/User";
+import { canCreateProject, getPlanLimitError } from "@/libs/plans";
 
 // GET /api/projects - Get all projects for the authenticated user
 export async function GET() {
@@ -48,6 +50,26 @@ export async function POST(req: Request) {
     }
 
     await connectMongo();
+
+    // Get user's plan
+    const user = await User.findById(session.user.id).select("plan");
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Check current project count
+    const currentProjectCount = await Project.countDocuments({
+      userId: session.user.id,
+    });
+
+    // Check if user can create more projects
+    if (!canCreateProject(currentProjectCount, user.plan)) {
+      return NextResponse.json(
+        { error: getPlanLimitError(user.plan, "projects") },
+        { status: 403 }
+      );
+    }
 
     const project = await Project.create({
       name: name.trim(),

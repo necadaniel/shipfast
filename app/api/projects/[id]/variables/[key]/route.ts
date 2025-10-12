@@ -2,6 +2,37 @@ import { auth } from "@/libs/next-auth";
 import { NextResponse } from "next/server";
 import connectMongo from "@/libs/mongoose";
 import Project from "@/models/Project";
+import Team from "@/models/Team";
+
+// Helper function to check project access (personal or team)
+async function checkProjectAccess(projectId: string, userId: string) {
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    return { hasAccess: false, project: null };
+  }
+
+  // Check personal project access
+  if (project.userId && project.userId.toString() === userId) {
+    return { hasAccess: true, project };
+  }
+
+  // Check team project access
+  if (project.isTeamProject && project.teamId) {
+    const team: any = await Team.findById(project.teamId).lean();
+    if (team) {
+      const isOwner = team.ownerId.toString() === userId;
+      const isMember = team.members.some(
+        (m: any) => m.userId.toString() === userId
+      );
+      if (isOwner || isMember) {
+        return { hasAccess: true, project };
+      }
+    }
+  }
+
+  return { hasAccess: false, project: null };
+}
 
 // DELETE /api/projects/[id]/variables/[key] - Delete a variable
 export async function DELETE(
@@ -19,12 +50,12 @@ export async function DELETE(
 
     await connectMongo();
 
-    const project = await Project.findOne({
-      _id: id,
-      userId: session.user.id,
-    });
+    const { hasAccess, project } = await checkProjectAccess(
+      id,
+      session.user.id
+    );
 
-    if (!project) {
+    if (!hasAccess || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 

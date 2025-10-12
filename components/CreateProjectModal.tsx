@@ -17,6 +17,9 @@ import apiClient from "@/libs/api";
 interface CreateProjectModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  teamId?: string; // Optional: if provided, creates team project
+  isTeamProject?: boolean;
+  onProjectCreated?: (project: any) => void; // Optional callback
 }
 
 const PROJECT_COLORS = [
@@ -31,6 +34,9 @@ const PROJECT_COLORS = [
 export default function CreateProjectModal({
   open,
   onOpenChange,
+  teamId,
+  isTeamProject = false,
+  onProjectCreated,
 }: CreateProjectModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +51,13 @@ export default function CreateProjectModal({
     setIsLoading(true);
 
     try {
-      await apiClient.post("/projects", formData);
+      // Determine which API endpoint to use
+      const endpoint =
+        isTeamProject && teamId ? `/team/${teamId}/projects` : "/projects";
+
+      const response: any = await apiClient.post(endpoint, formData);
+      // Note: apiClient interceptor returns response.data directly
+      const newProject = response.project;
 
       // Reset form
       setFormData({
@@ -57,11 +69,21 @@ export default function CreateProjectModal({
       // Close modal
       onOpenChange(false);
 
-      // Refresh the page to show new project
-      router.refresh();
-    } catch (error) {
+      // Call callback if provided
+      if (onProjectCreated) {
+        onProjectCreated(newProject);
+      }
+
+      // Refresh the page to show new project (if no callback)
+      if (!onProjectCreated) {
+        router.refresh();
+      }
+    } catch (error: any) {
       console.error("Error creating project:", error);
-      alert("Failed to create project. Please try again.");
+      const errorMessage =
+        error?.response?.data?.error ||
+        "Failed to create project. Please try again.";
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }

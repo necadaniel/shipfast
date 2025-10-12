@@ -2,6 +2,7 @@ import { auth } from "@/libs/next-auth";
 import { redirect } from "next/navigation";
 import connectMongo from "@/libs/mongoose";
 import Project from "@/models/Project";
+import Team from "@/models/Team";
 import ProjectDetailClient from "@/components/ProjectDetailClient";
 
 export const dynamic = "force-dynamic";
@@ -22,13 +23,32 @@ export default async function ProjectDetailPage({
 
   await connectMongo();
 
-  // Fetch the project and ensure it belongs to the current user
-  const project = await Project.findOne({
-    _id: id,
-    userId: session.user.id,
-  });
+  // Fetch the project
+  const project: any = await Project.findById(id).lean();
 
   if (!project) {
+    redirect("/dashboard");
+  }
+
+  // Check access: either personal project or team member
+  let hasAccess = false;
+
+  if (project.isTeamProject && project.teamId) {
+    // For team projects, check if user is a team member
+    const team: any = await Team.findById(project.teamId).lean();
+    if (team) {
+      const isOwner = team.ownerId.toString() === session.user.id;
+      const isMember = team.members.some(
+        (m: any) => m.userId.toString() === session.user.id
+      );
+      hasAccess = isOwner || isMember;
+    }
+  } else if (project.userId) {
+    // For personal projects, check if user is the owner
+    hasAccess = project.userId.toString() === session.user.id;
+  }
+
+  if (!hasAccess) {
     redirect("/dashboard");
   }
 
@@ -46,6 +66,8 @@ export default async function ProjectDetailPage({
     lastSyncedAt: project.lastSyncedAt?.toISOString() || null,
     createdAt: project.createdAt.toISOString(),
     updatedAt: project.updatedAt.toISOString(),
+    isTeamProject: project.isTeamProject || false,
+    teamId: project.teamId?.toString() || null,
   };
 
   return <ProjectDetailClient project={serializedProject} />;

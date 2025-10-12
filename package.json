@@ -10,6 +10,7 @@
     "lint": "next lint",
     "migrate:users": "tsx scripts/migrate-user-schema.ts",
     "migrate:all": "tsx scripts/migrate-schema.ts",
+    "migrate:free-plan": "tsx scripts/migrate-to-free-plan.ts",
     "user:set-plan": "tsx scripts/set-user-plan.ts"
   },
   "dependencies": {

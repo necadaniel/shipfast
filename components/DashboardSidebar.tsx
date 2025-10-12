@@ -40,13 +40,14 @@ const secondaryNavigation: NavItem[] = [
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({
+  showTeamNav = false,
+}: {
+  showTeamNav?: boolean;
+}) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-  // TODO: Get user's plan from session to show/hide Team nav
-  const hasTeamPlan = true; // Placeholder
 
   // Navigation items component (reusable for desktop and mobile)
   const NavigationItems = ({ onNavigate }: { onNavigate?: () => void }) => (
@@ -55,8 +56,8 @@ export default function DashboardSidebar() {
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <div className="space-y-1">
           {navigation.map((item) => {
-            // Hide team nav if user doesn't have team plan
-            if (item.teamOnly && !hasTeamPlan) return null;
+            // Hide team nav if user doesn't have access to teams
+            if (item.teamOnly && !showTeamNav) return null;
 
             const isActive =
               pathname === item.href ||
@@ -270,8 +271,8 @@ export default function DashboardSidebar() {
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             <div className="space-y-1">
               {navigation.map((item) => {
-                // Hide team nav if user doesn't have team plan
-                if (item.teamOnly && !hasTeamPlan) return null;
+                // Hide team nav if user doesn't have access to teams
+                if (item.teamOnly && !showTeamNav) return null;
 
                 // Check if current route matches this nav item
                 // For Projects, also match /dashboard/project/[id]

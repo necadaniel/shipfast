@@ -17,6 +17,7 @@ import {
   Loader2,
   Lock,
   Clipboard,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ import UploadEnvModal from "./UploadEnvModal";
 import DeleteVariableModal from "./DeleteVariableModal";
 import apiClient from "@/libs/api";
 import { useEncryption } from "@/hooks/useEncryption";
+import { useTeamEncryption } from "@/hooks/useTeamEncryption";
 import { decryptVariables } from "@/libs/encryption";
 
 interface Variable {
@@ -43,16 +45,39 @@ interface Project {
   lastSyncedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  isTeamProject?: boolean;
+  teamId?: string | null;
 }
 
 export default function ProjectDetailClient({ project }: { project: Project }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Personal encryption
   const {
-    encryptionKey,
-    isLoading: isLoadingKey,
-    error: keyError,
+    encryptionKey: personalKey,
+    isLoading: isLoadingPersonalKey,
+    error: personalKeyError,
   } = useEncryption();
+
+  // Team encryption (only if it's a team project)
+  const {
+    teamKey,
+    loading: isLoadingTeamKey,
+    error: teamKeyError,
+  } = useTeamEncryption(
+    project.isTeamProject && project.teamId ? project.teamId : "",
+    personalKey
+  );
+
+  // Determine which encryption key to use
+  const encryptionKey = project.isTeamProject ? teamKey : personalKey;
+  const isLoadingKey = project.isTeamProject
+    ? isLoadingPersonalKey || isLoadingTeamKey
+    : isLoadingPersonalKey;
+  const keyError = project.isTeamProject
+    ? personalKeyError || teamKeyError
+    : personalKeyError;
   const [variables, setVariables] = useState<Variable[]>([]);
   const [isDecrypting, setIsDecrypting] = useState(false);
   const [decryptError, setDecryptError] = useState<string | null>(null);
@@ -252,7 +277,15 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
                 <FileText className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold mb-2">{project.name}</h1>
+                <div className="flex items-center gap-2 mb-2">
+                  <h1 className="text-3xl font-bold">{project.name}</h1>
+                  {project.isTeamProject && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                      <Users className="w-3 h-3" />
+                      Team Project
+                    </span>
+                  )}
+                </div>
                 {project.description && (
                   <p className="text-muted-foreground">{project.description}</p>
                 )}
@@ -419,6 +452,8 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
         onOpenChange={setShowAddModal}
         projectId={project.id}
         existingKeys={variables.map((v) => v.key)}
+        isTeamProject={project.isTeamProject}
+        teamId={project.teamId}
         onSuccess={(newVariable: Variable) => {
           // Check if variable already exists (overwrite case)
           const existingIndex = variables.findIndex(
@@ -443,6 +478,8 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
         onOpenChange={setShowUploadModal}
         projectId={project.id}
         existingKeys={variables.map((v) => v.key)}
+        isTeamProject={project.isTeamProject}
+        teamId={project.teamId}
         onSuccess={(newVariables: Variable[]) => {
           setVariables([...variables, ...newVariables]);
           router.refresh();

@@ -139,7 +139,7 @@ const Pricing = () => {
 
                   {/* CTA */}
                   <div className="space-y-4">
-                    <ButtonCheckout priceId={plan.priceId} />
+                    <ButtonCheckout priceId={plan.priceId} mode="payment" />
 
                     <p className="text-sm text-center text-muted-foreground">
                       One-time payment • Lifetime access

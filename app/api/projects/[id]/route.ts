@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import Project from "@/models/Project";
+import Team from "@/models/Team";
+import User from "@/models/User";
 
 export const dynamic = "force-dynamic";
 
@@ -21,18 +23,38 @@ export async function DELETE(
 
     await connectMongo();
 
-    // Find and delete the project, ensuring it belongs to the user
-    const project = await Project.findOneAndDelete({
-      _id: id,
-      userId: session.user.id,
-    });
+    // Find the project first
+    const project = await Project.findById(id);
 
     if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // Check access control
+    let hasDeletePermission = false;
+
+    if (project.isTeamProject && project.teamId) {
+      // For team projects: check if user is team owner or admin
+      const team = await Team.findById(project.teamId);
+
+      if (team) {
+        const userRole = team.getUserRole(session.user.id);
+        hasDeletePermission = userRole === "owner" || userRole === "admin";
+      }
+    } else {
+      // For personal projects: check if user is the owner
+      hasDeletePermission = project.userId?.toString() === session.user.id;
+    }
+
+    if (!hasDeletePermission) {
       return NextResponse.json(
-        { error: "Project not found or unauthorized" },
-        { status: 404 }
+        { error: "You don't have permission to delete this project" },
+        { status: 403 }
       );
     }
+
+    // Delete the project
+    await Project.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,

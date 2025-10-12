@@ -40,13 +40,20 @@ interface Project {
   createdAt: string;
   updatedAt: string;
   lastSyncedAt: string | null;
+  isTeamProject?: boolean;
+  teamId?: string | null;
+  teamName?: string;
 }
 
 interface DashboardClientProps {
-  projects: Project[];
+  personalProjects: Project[];
+  teamProjects: Project[];
 }
 
-export default function DashboardClient({ projects }: DashboardClientProps) {
+export default function DashboardClient({
+  personalProjects,
+  teamProjects,
+}: DashboardClientProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
@@ -58,6 +65,147 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
     projectName: "",
   });
   const router = useRouter();
+
+  const allProjects = [...teamProjects, ...personalProjects];
+  const hasAnyProjects = allProjects.length > 0;
+
+  // Helper function to render a project card
+  const ProjectCard = ({ project }: { project: Project }) => (
+    <Link
+      key={project._id}
+      href={`/dashboard/project/${project._id}`}
+      className="group h-full"
+    >
+      <div className="relative rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 sm:p-6 transition-all hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_12px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-2px] shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.08)] active:scale-[0.98] cursor-pointer h-full flex flex-col">
+        {/* Color indicator */}
+        <div
+          className="absolute top-0 left-0 w-1 h-full rounded-l-xl"
+          style={{ backgroundColor: project.color }}
+        />
+
+        {/* Header */}
+        <div className="flex items-start justify-between mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <div
+              className="w-9 sm:w-10 h-9 sm:h-10 rounded-lg flex items-center justify-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)] flex-shrink-0"
+              style={{ backgroundColor: `${project.color}20` }}
+            >
+              <FolderOpen
+                className="w-4 sm:w-5 h-4 sm:h-5"
+                style={{ color: project.color }}
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                {project.name}
+              </h3>
+              {/* Badge for team projects - moved under title */}
+              {project.isTeamProject && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 mt-1">
+                  {project.teamName}
+                </span>
+              )}
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="p-1.5 sm:p-2 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+              >
+                <MoreVertical className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  router.push(`/dashboard/project/${project._id}`);
+                }}
+              >
+                <FolderOpen className="w-4 h-4 mr-2" />
+                Open Project
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  toast("Edit project coming soon!");
+                }}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Details
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDuplicateProject(project._id, project.name);
+                }}
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleImportVariables(project._id);
+                }}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Import Variables
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleExportEnv(project._id, project.name);
+                }}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export .env
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  openDeleteModal(project._id, project.name);
+                }}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {project.isTeamProject
+                  ? "Delete Project (Owner/Admin)"
+                  : "Delete Project"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Description */}
+        <div className="flex-1 mb-3 sm:mb-4 min-h-[2.5rem]">
+          {project.description && (
+            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
+              {project.description}
+            </p>
+          )}
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center flex-wrap gap-3 sm:gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <Key className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+            <span>{project.variableCount} variables</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Calendar className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+            <span>{formatDate(project.createdAt)}</span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
 
   // Listen for custom event from sidebar
   useEffect(() => {
@@ -177,7 +325,7 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
               Manage your environment variables across all your projects
             </p>
           </div>
-          {projects.length > 0 && (
+          {hasAnyProjects && (
             <Button
               onClick={() => setIsCreateModalOpen(true)}
               className="gap-2 shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_4px_16px_rgba(0,0,0,0.15)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_6px_20px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all w-full sm:w-auto"
@@ -189,7 +337,7 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
         </div>
 
         {/* Empty State */}
-        {projects.length === 0 && (
+        {!hasAnyProjects && (
           <div className="flex items-center justify-center min-h-[calc(100vh-12rem)] px-4">
             <div className="max-w-md w-full">
               {/* Empty State Card */}
@@ -254,153 +402,61 @@ export default function DashboardClient({ projects }: DashboardClientProps) {
         )}
 
         {/* Projects Grid */}
-        {projects.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {projects.map((project) => (
-              <Link
-                key={project._id}
-                href={`/dashboard/project/${project._id}`}
-                className="group h-full"
-              >
-                <div className="relative rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 sm:p-6 transition-all hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_12px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-2px] shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.08)] active:scale-[0.98] cursor-pointer h-full flex flex-col">
-                  {/* Color indicator */}
-                  <div
-                    className="absolute top-0 left-0 w-1 h-full rounded-l-xl"
-                    style={{ backgroundColor: project.color }}
-                  />
-
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-3 sm:mb-4">
-                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                      <div
-                        className="w-9 sm:w-10 h-9 sm:h-10 rounded-lg flex items-center justify-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)] flex-shrink-0"
-                        style={{ backgroundColor: `${project.color}20` }}
-                      >
-                        <FolderOpen
-                          className="w-4 sm:w-5 h-4 sm:h-5"
-                          style={{ color: project.color }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-                          {project.name}
-                        </h3>
-                      </div>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}
-                          className="p-1.5 sm:p-2 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.preventDefault();
-                            router.push(`/dashboard/project/${project._id}`);
-                          }}
-                        >
-                          <FolderOpen className="w-4 h-4 mr-2" />
-                          Open Project
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // TODO: Open edit modal
-                            toast("Edit project coming soon!");
-                          }}
-                        >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleDuplicateProject(project._id, project.name);
-                          }}
-                        >
-                          <Copy className="w-4 h-4 mr-2" />
-                          Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleImportVariables(project._id);
-                          }}
-                        >
-                          <Upload className="w-4 h-4 mr-2" />
-                          Import Variables
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleExportEnv(project._id, project.name);
-                          }}
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          Export .env
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.preventDefault();
-                            openDeleteModal(project._id, project.name);
-                          }}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete Project
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-
-                  {/* Description */}
-                  <div className="flex-1 mb-3 sm:mb-4">
-                    {project.description && (
-                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                        {project.description}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex items-center flex-wrap gap-3 sm:gap-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1.5">
-                      <Key className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-                      <span>{project.variableCount} variables</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-                      <span>{formatDate(project.createdAt)}</span>
-                    </div>
-                  </div>
+        {hasAnyProjects && (
+          <div className="space-y-8">
+            {/* Team Projects Section */}
+            {teamProjects.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <h2 className="text-lg font-semibold text-foreground">
+                    Team Projects
+                  </h2>
+                  <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                    {teamProjects.length}
+                  </span>
                 </div>
-              </Link>
-            ))}
-
-            {/* Add New Project Card */}
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="group rounded-xl border-2 border-dashed border-primary/30 p-6 hover:border-primary/50 hover:bg-primary/5 active:scale-[0.98] transition-all flex flex-col items-center justify-center text-center h-full min-h-[160px] sm:min-h-[180px]"
-            >
-              <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/20 transition-colors">
-                <FolderPlus className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {teamProjects.map((project) => (
+                    <ProjectCard key={project._id} project={project} />
+                  ))}
+                </div>
               </div>
-              <p className="text-sm sm:text-base font-medium text-foreground mb-1">
-                Create New Project
-              </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Add another project to manage
-              </p>
-            </button>
+            )}
+
+            {/* Personal Projects Section */}
+            {personalProjects.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <h2 className="text-lg font-semibold text-foreground">
+                    Personal Projects
+                  </h2>
+                  <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary/10 text-primary border border-primary/20">
+                    {personalProjects.length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {personalProjects.map((project) => (
+                    <ProjectCard key={project._id} project={project} />
+                  ))}
+
+                  {/* Add New Project Card */}
+                  <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="group rounded-xl border-2 border-dashed border-primary/30 p-6 hover:border-primary/50 hover:bg-primary/5 active:scale-[0.98] transition-all flex flex-col items-center justify-center text-center h-full min-h-[160px] sm:min-h-[180px]"
+                  >
+                    <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/20 transition-colors">
+                      <FolderPlus className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
+                    </div>
+                    <p className="text-sm sm:text-base font-medium text-foreground mb-1">
+                      Create New Project
+                    </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Add another project to manage
+                    </p>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

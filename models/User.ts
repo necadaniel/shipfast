@@ -45,8 +45,8 @@ const userSchema = new mongoose.Schema(
     // User's subscription plan
     plan: {
       type: String,
-      enum: ["solo", "team"],
-      default: "solo",
+      enum: ["free", "solo", "team"],
+      default: "free",
     },
     // Reference to team if user is part of one
     teamId: {

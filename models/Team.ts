@@ -45,7 +45,7 @@ const teamInvitationSchema = new mongoose.Schema(
     token: {
       type: String,
       required: true,
-      unique: true,
+      // Note: unique: true is removed here because we create index at schema level
     },
     invitedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -59,6 +59,26 @@ const teamInvitationSchema = new mongoose.Schema(
       default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
     sentAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false }
+);
+
+// Wrapped Team Key Schema (embedded)
+const wrappedTeamKeySchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    wrappedKey: {
+      type: String,
+      required: true, // Team key encrypted with user's personal key
+    },
+    wrappedAt: {
       type: Date,
       default: Date.now,
     },
@@ -81,6 +101,13 @@ const teamSchema = new mongoose.Schema(
     },
     members: [teamMemberSchema],
     pendingInvitations: [teamInvitationSchema],
+    // Encryption - Team Master Key (encrypted with each member's personal key)
+    teamEncryptionKey: {
+      type: String,
+      required: false, // Will be generated on first team project creation
+      select: false, // Never send to client directly
+    },
+    wrappedTeamKeys: [wrappedTeamKeySchema], // Team key wrapped for each member
     // Plan limits
     maxMembers: {
       type: Number,
@@ -113,6 +140,14 @@ teamSchema.virtual("pendingInvitationCount").get(function () {
   return this.pendingInvitations.length;
 });
 
+// Virtual for owner - creates a populate-able field
+teamSchema.virtual("owner", {
+  ref: "User",
+  localField: "ownerId",
+  foreignField: "_id",
+  justOne: true,
+});
+
 // Index for faster queries
 teamSchema.index({ ownerId: 1 });
 teamSchema.index({ "members.userId": 1 });
@@ -120,10 +155,19 @@ teamSchema.index({ "pendingInvitations.email": 1 });
 teamSchema.index({ "pendingInvitations.token": 1 });
 
 // Method to check if user is member
-teamSchema.methods.isMember = function (userId: string) {
+teamSchema.methods.isMember = function (userIdOrEmail: string) {
+  // Check if it's an email
+  if (userIdOrEmail.includes("@")) {
+    const email = userIdOrEmail.toLowerCase();
+    // Check if email matches owner (need to populate owner first)
+    // or any member email
+    return this.members.some((m: any) => m.email?.toLowerCase() === email);
+  }
+
+  // Otherwise treat as userId
   return (
-    this.ownerId.toString() === userId ||
-    this.members.some((m: any) => m.userId.toString() === userId)
+    this.ownerId.toString() === userIdOrEmail ||
+    this.members.some((m: any) => m.userId.toString() === userIdOrEmail)
   );
 };
 
