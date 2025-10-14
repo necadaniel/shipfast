@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import AddVariableModal from "./AddVariableModal";
 import UploadEnvModal from "./UploadEnvModal";
 import DeleteVariableModal from "./DeleteVariableModal";
+import EditVariableModal from "./EditVariableModal";
 import apiClient from "@/libs/api";
 import { useEncryption } from "@/hooks/useEncryption";
 import { useTeamEncryption } from "@/hooks/useTeamEncryption";
@@ -85,6 +86,11 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [variableToDelete, setVariableToDelete] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [variableToEdit, setVariableToEdit] = useState<{
+    key: string;
+    value: string;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleValues, setVisibleValues] = useState<Set<string>>(new Set());
 
@@ -172,6 +178,12 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
   const handleDeleteClick = (key: string) => {
     setVariableToDelete(key);
     setDeleteModalOpen(true);
+  };
+
+  // Edit variable
+  const handleEditClick = (key: string, value: string) => {
+    setVariableToEdit({ key, value });
+    setEditModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -433,6 +445,16 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={() =>
+                        handleEditClick(variable.key, variable.value)
+                      }
+                      className="h-8 w-8 p-0"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleDeleteClick(variable.key)}
                       className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                     >
@@ -493,6 +515,36 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
         variableKey={variableToDelete || ""}
         onConfirm={handleDeleteConfirm}
       />
+
+      {/* Edit Variable Modal */}
+      {variableToEdit && (
+        <EditVariableModal
+          open={editModalOpen}
+          onOpenChange={setEditModalOpen}
+          projectId={project.id}
+          variableKey={variableToEdit.key}
+          currentValue={variableToEdit.value}
+          existingKeys={variables.map((v) => v.key)}
+          isTeamProject={project.isTeamProject}
+          teamId={project.teamId}
+          onSuccess={(updatedVariable) => {
+            // If key changed, remove old one and add new one
+            if (updatedVariable.key !== variableToEdit.key) {
+              const updatedVariables = variables.filter(
+                (v) => v.key !== variableToEdit.key
+              );
+              setVariables([...updatedVariables, updatedVariable]);
+            } else {
+              // Just update the value
+              const updatedVariables = variables.map((v) =>
+                v.key === updatedVariable.key ? updatedVariable : v
+              );
+              setVariables(updatedVariables);
+            }
+            router.refresh();
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -101,7 +101,7 @@ export default function DeleteTeamModal({
               ⚠️ Warning
             </p>
             <p className="text-sm text-muted-foreground">
-              You are about to delete <strong>"{teamName}"</strong>. All team
+              You are about to delete <strong>&quot;{teamName}&quot;</strong>. All team
               projects and their environment variables will be permanently
               removed. Team members will lose access immediately.
             </p>

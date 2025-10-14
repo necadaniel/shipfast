@@ -127,7 +127,7 @@ const Problem = () => {
               <div className="text-6xl opacity-40">😰</div>
               <ArrowRight className="w-8 h-8 text-muted-foreground rotate-90 md:rotate-0" />
               <p className="text-sm text-center text-muted-foreground font-medium">
-                There's a better way
+                There&apos;s a better way
               </p>
             </div>
           </div>

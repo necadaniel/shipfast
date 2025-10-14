@@ -106,6 +106,7 @@ Based on workspace structure:
 - `/api/projects` - GET (list projects), POST (create project)
 - `/api/projects/[id]` - GET, PATCH, DELETE (single project)
 - `/api/projects/[id]/variables` - GET, POST (manage variables)
+- `/api/projects/[id]/history` - GET (fetch change history for project)
 - `/api/user/plan` - GET (fetch user's current plan)
 - `/api/team` - GET (list all teams user has access to), POST (create team)
 - `/api/team/[id]` - GET (team details), PATCH (update), DELETE (delete team)
@@ -148,6 +149,15 @@ Based on workspace structure:
 - Fields: name, description, userId, color, variables (encrypted JSON string), variableCount, lastSyncedAt
 - Indexed by userId and createdAt for performance
 - Uses Mongoose with toJSON plugin
+
+### VariableHistory Model (`models/VariableHistory.ts`) - NEW
+
+- Comprehensive audit trail for all variable changes
+- Fields: projectId, teamId, userId, action, variableKey, oldValue, newValue, metadata, canRollback
+- Action types: created, updated, deleted, bulk_import
+- Metadata tracks source (web/cli/api), IP address, user agent
+- Compound indexes: projectId+createdAt, userId+createdAt, teamId+createdAt
+- Supports rollback tracking (rolledBackAt, rolledBackBy)
 
 ---
 
@@ -434,18 +444,27 @@ Based on integrations:
     - Quick action buttons: Download .env, Upload .env
     - Searchable variables table with filtering
     - Each variable row shows: key, masked value (toggle visibility), actions
+    - **Action buttons**: Show/hide value, Copy, Edit, Delete
     - Empty state for projects with no variables
     - Copy to clipboard functionality **with toast notification**
+    - **Edit variable** with confirmation modal and encryption
     - Delete variable with confirmation modal
     - **Decryption on load** - Variables decrypted client-side on component mount
     - Loading state with lock icon while decrypting
     - Error handling for decryption failures
-    - **Toast notifications** for all user actions (copy, add, delete, import)
+    - **Toast notifications** for all user actions (copy, add, edit, delete, import)
   - AddVariableModal.tsx - Form to add new key-value pairs:
     - Validates key format (UPPER_CASE, no special chars)
     - Checks for duplicate keys
     - Shows errors inline
     - **Encrypts value before API call**
+    - **Toast notifications** for success and errors
+  - EditVariableModal.tsx - Form to edit existing variables:
+    - Allows changing key name and/or value
+    - Validates key format and checks for duplicates
+    - Shows errors inline
+    - **Encrypts value before API call**
+    - Supports team project encryption
     - **Toast notifications** for success and errors
   - DeleteVariableModal.tsx - Confirmation dialog for deleting variables:
     - Warning icon with destructive color scheme
@@ -475,6 +494,7 @@ Based on integrations:
   - API endpoints:
     - GET `/api/projects/[id]/variables` - Fetch all variables (encrypted)
     - POST `/api/projects/[id]/variables` - Add new variable (receives encrypted)
+    - PATCH `/api/projects/[id]/variables/[key]` - Update variable (value or key)
     - DELETE `/api/projects/[id]/variables/[key]` - Delete variable
   - Updates lastSyncedAt timestamp on all modifications
   - Combined shadows and layered colors throughout (no borders)
@@ -633,6 +653,72 @@ Based on integrations:
   - [ ] Remove members functionality - Future
   - [ ] Cancel pending invitations - Future
   - [ ] Share existing personal project with team - Future
+- **Version Control & History System (IN PROGRESS - Phase 2)**:
+  - ✅ **VariableHistory Model** - Comprehensive audit trail:
+    - Tracks all variable changes (create, update, delete, bulk_import)
+    - Stores encrypted old/new values for potential rollback
+    - Indexes: projectId+createdAt, userId+createdAt, teamId+createdAt
+    - Fields: action, variableKey, oldValue, newValue, metadata (source, IP, userAgent)
+    - Rollback capability flags (canRollback, rolledBackAt, rolledBackBy)
+  - ✅ **API Routes Updated to Log Changes**:
+    - POST `/api/projects/[id]/variables` - Logs "created" action
+    - PATCH `/api/projects/[id]/variables/[key]` - Logs "updated" action with old and new values
+    - DELETE `/api/projects/[id]/variables/[key]` - Logs "deleted" action with old value
+    - Helper function `logVariableChange()` for consistent logging
+    - Logs user, timestamp, project, team context
+  - ✅ **History API Endpoint** - Enhanced with filtering:
+    - GET `/api/projects/[id]/history` - Fetch project change history
+    - Query parameters: `action`, `startDate`, `endDate`, `search`, `userId`
+    - Case-insensitive regex search on variableKey
+    - Date range filtering with proper day boundaries
+    - Sorted by newest first
+    - Populates user details (name, email, image)
+    - Access control (personal or team project members only)
+  - ✅ **History List Page** - `/dashboard/history`:
+    - Shows all projects with change history
+    - Grid view of project cards
+    - Stats per project: change count, last change time
+    - Sorts by most recently changed
+    - Combined shadows, no borders
+    - Empty state for no history
+  - ✅ **HistoryClient Component**:
+    - Project cards with color coding
+    - Change count and last change timestamp
+    - "Team Project" badge for team projects
+    - Click to view detailed timeline
+  - ✅ **Project History Detail Page** - `/dashboard/history/[id]`:
+    - Timeline view of all changes for a project
+    - Grouped by date (Today, Yesterday, specific dates)
+    - Each entry shows: user avatar, action badge, variable key, timestamp
+    - Action types: Created (green), Updated (blue), Deleted (red), Imported (purple)
+    - Relative time + absolute time display
+    - Source indicator (web, CLI, API)
+    - Breadcrumb navigation back to history list
+  - ✅ **ProjectHistoryClient Component** - Enhanced with filtering:
+    - Client-side data fetching with React state
+    - **Filter Panel** (collapsible):
+      - Search input for variable names (debounced 500ms)
+      - Action type dropdown (All, Created, Updated, Deleted, Imported)
+      - Team member dropdown (for team projects with multiple users)
+      - Date range picker with dual-month calendar (react-day-picker)
+      - Active filter count badge
+      - "Clear Filters" button
+    - Loading spinner during API calls
+    - "No results found" state when filters return empty
+    - Date-grouped timeline
+    - Color-coded action badges with icons
+    - User avatars and names
+    - Formatted timestamps with date-fns
+    - Empty state handling
+    - Sticky date headers
+  - ✅ **New UI Components**:
+    - `/components/ui/select.tsx` - Radix UI Select dropdown
+    - `/components/ui/calendar.tsx` - Date picker calendar (react-day-picker)
+    - `/components/ui/date-range-picker.tsx` - Date range picker with calendar
+  - [ ] Rollback capability - Phase 3
+  - [ ] Value masking/reveal toggle - Phase 3
+  - [ ] Bulk operation grouping - Phase 3
+  - [ ] Export audit logs (CSV/JSON) - Phase 4
 - **Landing Page Components (COMPLETED)**
   - ✅ Header
   - ✅ Hero section
@@ -685,8 +771,9 @@ Bottom:
 3. `/dashboard/devices` - Device management (TO BUILD)
 4. ✅ `/dashboard/team` - Teams list (grid view)
 5. ✅ `/dashboard/team/[id]` - Team detail & member management
-6. `/dashboard/history` - Version history (TO BUILD)
-7. `/dashboard/settings` - Account settings (TO BUILD)
+6. ✅ `/dashboard/history` - Projects with change history (list view)
+7. ✅ `/dashboard/history/[id]` - Project timeline with all changes
+8. `/dashboard/settings` - Account settings (TO BUILD)
 
 ---
 

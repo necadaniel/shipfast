@@ -91,7 +91,7 @@ export default function DeleteProjectModal({
               ⚠️ Warning
             </p>
             <p className="text-sm text-muted-foreground">
-              You are about to delete <strong>"{projectName}"</strong>. All
+              You are about to delete <strong>&quot;{projectName}&quot;</strong>. All
               environment variables in this project will be permanently removed.
             </p>
           </div>

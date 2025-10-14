@@ -19,7 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ButtonAccount from "@/components/ButtonAccount";
 import config from "@/config";
 import logo from "@/app/icon.png";
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface NavItem {
   name: string;
@@ -279,12 +279,18 @@ export default function DashboardSidebar({
                 // Check if current route matches this nav item
                 // For Projects, also match /dashboard/project/[id]
                 // For Team, also match /dashboard/team/[id]
+                // For Devices, also match /dashboard/devices/[id]
+                // For History, also match /dashboard/history/[id]
                 const isActive =
                   pathname === item.href ||
                   (item.href === "/dashboard" &&
                     pathname.startsWith("/dashboard/project/")) ||
                   (item.href === "/dashboard/team" &&
-                    pathname.startsWith("/dashboard/team/"));
+                    pathname.startsWith("/dashboard/team/")) ||
+                  (item.href === "/dashboard/devices" &&
+                    pathname.startsWith("/dashboard/devices/")) ||
+                  (item.href === "/dashboard/history" &&
+                    pathname.startsWith("/dashboard/history/"));
                 const Icon = item.icon;
 
                 return (

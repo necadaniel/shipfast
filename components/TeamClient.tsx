@@ -250,7 +250,7 @@ export default function TeamClient({ user }: { user: UserProps }) {
               Member management coming soon
             </h3>
             <p className="text-muted-foreground">
-              We're working on invitations, role management, and more team
+              We&apos;re working on invitations, role management, and more team
               features.
             </p>
           </div>

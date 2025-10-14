@@ -3,6 +3,52 @@ import { NextResponse } from "next/server";
 import connectMongo from "@/libs/mongoose";
 import Project from "@/models/Project";
 import Team from "@/models/Team";
+import VariableHistory from "@/models/VariableHistory";
+
+// Helper function to log variable changes
+async function logVariableChange(data: {
+  projectId: string;
+  teamId?: string;
+  userId: string;
+  action: "created" | "updated" | "deleted" | "bulk_import";
+  variableKey: string;
+  oldValue?: string;
+  newValue?: string;
+  bulkChanges?: Array<{
+    key: string;
+    action: string;
+    oldValue?: string;
+    newValue?: string;
+  }>;
+  metadata?: {
+    source?: "web" | "cli" | "api";
+    ipAddress?: string;
+    userAgent?: string;
+  };
+}) {
+  try {
+    const historyEntry = new VariableHistory({
+      projectId: data.projectId,
+      teamId: data.teamId,
+      userId: data.userId,
+      action: data.action,
+      variableKey: data.variableKey,
+      oldValue: data.oldValue,
+      newValue: data.newValue,
+      bulkChanges: data.bulkChanges,
+      metadata: {
+        source: data.metadata?.source || "web",
+        ipAddress: data.metadata?.ipAddress,
+        userAgent: data.metadata?.userAgent,
+      },
+      canRollback: true,
+    });
+    await historyEntry.save();
+  } catch (error) {
+    console.error("Error logging variable change:", error);
+    // Don't throw - logging failure shouldn't break the main operation
+  }
+}
 
 // Helper function to check project access (personal or team)
 async function checkProjectAccess(projectId: string, userId: string) {
@@ -124,6 +170,16 @@ export async function POST(
     project.variableCount = variables.length;
     project.lastSyncedAt = new Date();
     await project.save();
+
+    // Log the change
+    await logVariableChange({
+      projectId: id,
+      teamId: project.teamId?.toString(),
+      userId: session.user.id,
+      action: "created",
+      variableKey: key,
+      newValue: value, // Already encrypted by client
+    });
 
     return NextResponse.json({ key, value }, { status: 201 });
   } catch (error) {

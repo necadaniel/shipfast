@@ -121,7 +121,7 @@ export default function InviteClient({ data }: { data: InvitationData }) {
               <Mail className="w-8 h-8 text-primary" />
             </div>
             <h1 className="text-3xl font-bold text-center mb-2">
-              You're Invited!
+              You&apos;re Invited!
             </h1>
             <p className="text-center text-muted-foreground">
               Join {data.team.name} and start collaborating
