@@ -1,25 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, Users, FolderOpen } from "lucide-react";
 import apiClient from "@/libs/api";
+
+interface Team {
+  id: string;
+  name: string;
+}
 
 interface CreateProjectModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  teamId?: string; // Optional: if provided, creates team project
-  isTeamProject?: boolean;
+  teamId?: string; // Optional: if provided, creates team project (for TeamDetailClient)
+  isTeamProject?: boolean; // Force team project mode
   onProjectCreated?: (project: any) => void; // Optional callback
+  userPlan?: string; // User's plan (to show team option)
+  teams?: Team[]; // Available teams for selection
 }
 
 const PROJECT_COLORS = [
@@ -37,6 +45,8 @@ export default function CreateProjectModal({
   teamId,
   isTeamProject = false,
   onProjectCreated,
+  userPlan,
+  teams = [],
 }: CreateProjectModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +55,33 @@ export default function CreateProjectModal({
     description: "",
     color: PROJECT_COLORS[0].value,
   });
+  const [projectType, setProjectType] = useState<"personal" | "team">(
+    "personal"
+  );
+  const [selectedTeamId, setSelectedTeamId] = useState<string>("");
+
+  const hasTeamPlan = userPlan === "team";
+  const showTeamOption = hasTeamPlan && teams.length > 0 && !teamId; // Don't show if teamId is already provided
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        name: "",
+        description: "",
+        color: PROJECT_COLORS[0].value,
+      });
+      // Set default based on context
+      if (teamId) {
+        setProjectType("team");
+        setSelectedTeamId(teamId);
+      } else {
+        setProjectType("personal");
+        setSelectedTeamId(teams.length > 0 ? teams[0].id : "");
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, teamId]); // Only depend on open and teamId, not teams array
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +89,16 @@ export default function CreateProjectModal({
 
     try {
       // Determine which API endpoint to use
-      const endpoint =
-        isTeamProject && teamId ? `/team/${teamId}/projects` : "/projects";
+      let endpoint = "/projects";
+      let shouldCreateAsTeamProject = isTeamProject;
+      let targetTeamId = teamId;
+
+      // If user selected team project and chose a team
+      if (projectType === "team" && selectedTeamId) {
+        endpoint = `/team/${selectedTeamId}/projects`;
+        shouldCreateAsTeamProject = true;
+        targetTeamId = selectedTeamId;
+      }
 
       const response: any = await apiClient.post(endpoint, formData);
       // Note: apiClient interceptor returns response.data directly
@@ -96,9 +141,88 @@ export default function CreateProjectModal({
           <DialogTitle className="text-2xl font-bold">
             Create New Project
           </DialogTitle>
+          {showTeamOption && (
+            <DialogDescription>
+              Choose whether to create a personal project or share it with your
+              team.
+            </DialogDescription>
+          )}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+          {/* Project Type Selection - Only show if user has team plan and teams available */}
+          {showTeamOption && (
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">
+                Project Type
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setProjectType("personal")}
+                  disabled={isLoading}
+                  className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                    projectType === "personal"
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-muted-foreground/50"
+                  }`}
+                >
+                  <FolderOpen className="w-5 h-5" />
+                  <div className="text-left">
+                    <div className="font-medium">Personal</div>
+                    <div className="text-xs text-muted-foreground">
+                      Only you
+                    </div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectType("team")}
+                  disabled={isLoading}
+                  className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                    projectType === "team"
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-muted-foreground/50"
+                  }`}
+                >
+                  <Users className="w-5 h-5" />
+                  <div className="text-left">
+                    <div className="font-medium">Team</div>
+                    <div className="text-xs text-muted-foreground">
+                      Shared access
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Team Selection - Only show if team project type is selected */}
+          {showTeamOption && projectType === "team" && (
+            <div className="space-y-2">
+              <label
+                htmlFor="team"
+                className="text-sm font-medium text-foreground"
+              >
+                Select Team <span className="text-destructive">*</span>
+              </label>
+              <select
+                id="team"
+                value={selectedTeamId}
+                onChange={(e) => setSelectedTeamId(e.target.value)}
+                disabled={isLoading}
+                required
+                className="w-full px-3 py-2 rounded-lg border border-input bg-background shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Project Name */}
           <div className="space-y-2">
             <label
@@ -126,6 +250,7 @@ export default function CreateProjectModal({
               htmlFor="description"
               className="text-sm font-medium text-foreground"
             >
+              {" "}
               Description
             </label>
             <Textarea

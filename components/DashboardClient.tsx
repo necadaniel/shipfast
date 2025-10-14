@@ -45,14 +45,23 @@ interface Project {
   teamName?: string;
 }
 
+interface Team {
+  id: string;
+  name: string;
+}
+
 interface DashboardClientProps {
   personalProjects: Project[];
   teamProjects: Project[];
+  userPlan: string;
+  teams: Team[];
 }
 
 export default function DashboardClient({
   personalProjects,
   teamProjects,
+  userPlan,
+  teams,
 }: DashboardClientProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{
@@ -68,6 +77,7 @@ export default function DashboardClient({
 
   const allProjects = [...teamProjects, ...personalProjects];
   const hasAnyProjects = allProjects.length > 0;
+  const hasTeamPlan = userPlan === "team";
 
   // Helper function to render a project card
   const ProjectCard = ({ project }: { project: Project }) => (
@@ -465,6 +475,8 @@ export default function DashboardClient({
       <CreateProjectModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
+        userPlan={userPlan}
+        teams={teams}
       />
 
       {/* Delete Project Modal */}

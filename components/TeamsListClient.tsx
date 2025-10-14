@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import DeleteTeamModal from "@/components/DeleteTeamModal";
+import CreateProjectModal from "@/components/CreateProjectModal";
 import apiClient from "@/libs/api";
 
 interface UserProps {
@@ -63,6 +64,7 @@ export default function TeamsListClient({
   const router = useRouter();
   const [teams, setTeams] = useState<Team[]>(initialTeams);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{
@@ -74,6 +76,14 @@ export default function TeamsListClient({
     teamId: "",
     teamName: "",
   });
+
+  // Listen for custom event from sidebar "New Project" button
+  useEffect(() => {
+    const handleOpenModal = () => setShowCreateProjectModal(true);
+    window.addEventListener("openCreateProject", handleOpenModal);
+    return () =>
+      window.removeEventListener("openCreateProject", handleOpenModal);
+  }, []);
 
   const handleCreateTeam = async () => {
     if (!teamName.trim()) {
@@ -402,6 +412,17 @@ export default function TeamsListClient({
           teamId={deleteModal.teamId}
           teamName={deleteModal.teamName}
           onSuccess={handleDeleteSuccess}
+        />
+
+        {/* Create Project Modal */}
+        <CreateProjectModal
+          open={showCreateProjectModal}
+          onOpenChange={setShowCreateProjectModal}
+          userPlan={user.plan}
+          teams={teams.map((t) => ({ id: t.id, name: t.name }))}
+          onProjectCreated={(project) => {
+            router.push(`/dashboard/project/${project._id}`);
+          }}
         />
       </div>
     </div>

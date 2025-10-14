@@ -62,7 +62,9 @@ export default function DashboardSidebar({
             const isActive =
               pathname === item.href ||
               (item.href === "/dashboard" &&
-                pathname.startsWith("/dashboard/project/"));
+                pathname.startsWith("/dashboard/project/")) ||
+              (item.href === "/dashboard/team" &&
+                pathname.startsWith("/dashboard/team/"));
             const Icon = item.icon;
 
             return (
@@ -276,10 +278,13 @@ export default function DashboardSidebar({
 
                 // Check if current route matches this nav item
                 // For Projects, also match /dashboard/project/[id]
+                // For Team, also match /dashboard/team/[id]
                 const isActive =
                   pathname === item.href ||
                   (item.href === "/dashboard" &&
-                    pathname.startsWith("/dashboard/project/"));
+                    pathname.startsWith("/dashboard/project/")) ||
+                  (item.href === "/dashboard/team" &&
+                    pathname.startsWith("/dashboard/team/"));
                 const Icon = item.icon;
 
                 return (

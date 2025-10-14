@@ -104,6 +104,14 @@ export default function TeamDetailClient({
   const isOwner = userRole === "owner";
   const canCreateProjects = userRole === "owner" || userRole === "admin";
 
+  // Listen for custom event from sidebar "New Project" button
+  useEffect(() => {
+    const handleOpenModal = () => setIsCreateProjectModalOpen(true);
+    window.addEventListener("openCreateProject", handleOpenModal);
+    return () =>
+      window.removeEventListener("openCreateProject", handleOpenModal);
+  }, []);
+
   // Fetch team projects
   useEffect(() => {
     if (activeTab === "projects") {
@@ -248,7 +256,7 @@ export default function TeamDetailClient({
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Back Button */}
         <Link href="/dashboard/team">
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" className="mb-2">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Teams
           </Button>

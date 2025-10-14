@@ -1,6 +1,7 @@
 import { auth } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import Project from "@/models/Project";
+import User from "@/models/User";
 import DashboardClient from "@/components/DashboardClient";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,9 @@ export default async function Dashboard() {
   const session = await auth();
 
   await connectMongo();
+
+  // Fetch user data
+  const user: any = await User.findById(session?.user?.id).lean();
 
   // Fetch user's personal projects
   const personalProjects = await Project.find({ userId: session?.user?.id })
@@ -72,10 +76,18 @@ export default async function Dashboard() {
     };
   });
 
+  // Serialize teams
+  const serializedTeams = teams.map((team) => ({
+    id: team._id.toString(),
+    name: team.name,
+  }));
+
   return (
     <DashboardClient
       personalProjects={serializedPersonalProjects}
       teamProjects={serializedTeamProjects}
+      userPlan={user?.plan || "free"}
+      teams={serializedTeams}
     />
   );
 }
