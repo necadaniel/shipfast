@@ -57,50 +57,58 @@ const ButtonAccount = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 h-auto px-3 py-2.5 hover:bg-muted/50 shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_2px_4px_rgba(0,0,0,0.05)]"
+        >
           {session?.user?.image ? (
             <img
               src={session?.user?.image}
               alt={session?.user?.name || "Account"}
-              className="w-6 h-6 rounded-full shrink-0"
+              className="w-8 h-8 rounded-full shrink-0"
               referrerPolicy="no-referrer"
-              width={24}
-              height={24}
+              width={32}
+              height={32}
             />
           ) : (
-            <div className="w-6 h-6 bg-muted flex justify-center items-center rounded-full shrink-0">
+            <div className="w-8 h-8 bg-primary/20 flex justify-center items-center rounded-full shrink-0 text-primary font-semibold text-sm">
               {session?.user?.name?.charAt(0) ||
                 session?.user?.email?.charAt(0)}
             </div>
           )}
-  
-          {session?.user?.name || "Account"}
-  
+
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-sm font-medium text-foreground truncate">
+              {session?.user?.name || session?.user?.email || "Account"}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">Solo Plan</p>
+          </div>
+
           {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin shrink-0" />
           ) : (
-            <ChevronDown className="w-4 h-4 opacity-50 transition-transform duration-200 data-[state=open]:rotate-180" />
+            <ChevronDown className="w-4 h-4 opacity-50 transition-transform duration-200 shrink-0 data-[state=open]:rotate-180" />
           )}
         </Button>
       </PopoverTrigger>
-      
-      <PopoverContent className="w-64 p-1" align="start">
+
+      <PopoverContent className="w-64 p-1" align="start" side="top">
         <div className="space-y-0.5 text-sm">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 h-auto py-1.5 px-4 font-medium text-left"
+            className="w-full justify-start gap-2 h-auto py-2 px-3 font-medium text-left"
             onClick={handleBilling}
           >
-            <CreditCard className="w-5 h-5" />
+            <CreditCard className="w-4 h-4" />
             Billing
           </Button>
-          
+
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 h-auto py-1.5 px-4 font-medium text-left hover:bg-destructive/10 hover:text-destructive"
+            className="w-full justify-start gap-2 h-auto py-2 px-3 font-medium text-left hover:bg-destructive/10 hover:text-destructive"
             onClick={handleSignOut}
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
             Logout
           </Button>
         </div>

@@ -26,6 +26,26 @@ export interface ConfigProps {
   appName: string;
   appDescription: string;
   domainName: string;
+  plans?: {
+    free: {
+      maxProjects: number;
+      maxDevices: number;
+      maxVariablesPerProject: number;
+      features: string[];
+    };
+    solo: {
+      maxProjects: number;
+      maxDevices: number;
+      maxVariablesPerProject: number;
+      features: string[];
+    };
+    team: {
+      maxProjects: number; // -1 means unlimited
+      maxDevices: number; // -1 means unlimited
+      maxVariablesPerProject: number; // -1 means unlimited
+      features: string[];
+    };
+  };
   crisp: {
     id?: string;
     onlyShowOnRoutes?: string[];
@@ -54,7 +74,7 @@ export interface ConfigProps {
     supportEmail?: string;
   };
   colors: {
-    theme: Theme;
+    theme?: Theme;
     main: string;
   };
   auth: {

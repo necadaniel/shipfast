@@ -13,7 +13,7 @@ export const authOptions = {
       // Follow the "Login with Google" tutorial to get your credentials
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
-      profile(profile) {
+      async profile(profile) {
         return {
           id: profile.sub,
           name: profile.given_name ? profile.given_name : profile.name,
@@ -47,11 +47,70 @@ export const authOptions = {
   ...(connectMongo && { adapter: MongoDBAdapter(connectMongo) }),
 
   callbacks: {
+    jwt: async ({ token, user, account, profile }: any) => {
+      // On sign in, attach the MongoDB user ID to the token
+      if (user) {
+        token.id = user.id || user._id;
+      }
+      return token;
+    },
     session: async ({ session, token }: any) => {
       if (session?.user) {
-        session.user.id = token.sub;
+        // Use the MongoDB user ID from the token
+        session.user.id = token.id || token.sub;
       }
       return session;
+    },
+  },
+  events: {
+    createUser: async ({ user }: any) => {
+      try {
+        console.log("=== CREATE USER EVENT FIRED ===");
+        console.log("User ID:", user.id);
+        console.log("User email:", user.email);
+
+        // Import dependencies
+        const crypto = await import("crypto");
+        const connectMongoose = (await import("./mongoose")).default;
+
+        // Ensure MongoDB connection is established
+        console.log("Connecting to MongoDB...");
+        await connectMongoose();
+        console.log("MongoDB connected");
+
+        const User = (await import("@/models/User")).default;
+
+        // Generate encryption key immediately on signup
+        const encryptionKey = crypto.randomBytes(32).toString("base64");
+        console.log("Generated encryption key length:", encryptionKey.length);
+
+        // Use $set to ensure fields are added
+        const result = await User.findByIdAndUpdate(
+          user.id,
+          {
+            $set: {
+              hasAccess: false,
+              plan: "free", // New users start with free plan
+              teamId: null,
+              teamRole: null,
+              encryptionKey: encryptionKey,
+              customerId: null,
+              priceId: null,
+            },
+          },
+          { new: true }
+        );
+
+        console.log("Update result:", result ? "Success" : "Failed");
+        if (result) {
+          console.log("User has encryptionKey:", !!result.encryptionKey);
+        }
+        console.log("=== END CREATE USER EVENT ===");
+      } catch (error) {
+        console.error("=== CREATE USER EVENT ERROR ===");
+        console.error(error);
+        console.error("=== END ERROR ===");
+      }
     },
   },
   session: {

@@ -82,6 +82,14 @@ export async function POST(req: NextRequest) {
         user.priceId = priceId;
         user.customerId = customerId;
         user.hasAccess = true;
+        
+        // Set the plan based on the Stripe price ID
+        if (priceId === configFile.stripe.plans[0].priceId) {
+          user.plan = "solo";
+        } else if (priceId === configFile.stripe.plans[1].priceId) {
+          user.plan = "team";
+        }
+        
         await user.save();
 
         // Extra: send email with user link, product page, etc...
@@ -118,8 +126,9 @@ export async function POST(req: NextRequest) {
         );
         const user = await User.findOne({ customerId: subscription.customer });
 
-        // Revoke access to your product
+        // Revoke access to your product and reset to free plan
         user.hasAccess = false;
+        user.plan = "free";
         await user.save();
 
         break;
@@ -142,6 +151,14 @@ export async function POST(req: NextRequest) {
 
         // Grant user access to your product. It's a boolean in the database, but could be a number of credits, etc...
         user.hasAccess = true;
+        
+        // Set the plan based on the Stripe price ID
+        if (priceId === configFile.stripe.plans[0].priceId) {
+          user.plan = "solo";
+        } else if (priceId === configFile.stripe.plans[1].priceId) {
+          user.plan = "team";
+        }
+        
         await user.save();
 
         break;
