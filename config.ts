@@ -4,7 +4,7 @@ import { ConfigProps } from "./types/config";
 const themes = {
   light: {
     primary: "oklch(0.205 0 0)", // --primary from globals.css
-  }
+  },
 };
 
 const config = {
@@ -83,7 +83,7 @@ const config = {
     // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
     fromAdmin: `Daniel at ShipFast <daniel@resend.shipfa.st>`,
     // Email shown to customer if they need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
-    supportEmail: "neca.daniel@icloud.com",
+    supportEmail: "neca.danii@gmail.com",
   },
   colors: {
     // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..)
