@@ -65,13 +65,13 @@ const ButtonAccount = () => {
             <img
               src={session?.user?.image}
               alt={session?.user?.name || "Account"}
-              className="w-8 h-8 rounded-full shrink-0"
+              className="w-8 h-8 rounded-full corner-squircle shrink-0"
               referrerPolicy="no-referrer"
               width={32}
               height={32}
             />
           ) : (
-            <div className="w-8 h-8 bg-primary/20 flex justify-center items-center rounded-full shrink-0 text-primary font-semibold text-sm">
+            <div className="w-8 h-8 bg-primary/20 flex justify-center items-center rounded-full corner-squircle shrink-0 text-primary font-semibold text-sm">
               {session?.user?.name?.charAt(0) ||
                 session?.user?.email?.charAt(0)}
             </div>

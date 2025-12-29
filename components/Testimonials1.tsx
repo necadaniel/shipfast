@@ -13,12 +13,12 @@ const Testimonial = () => {
       <div className="mx-auto max-w-2xl lg:max-w-5xl">
         <figure className="mt-10">
           <div className="flex flex-col lg:flex-row items-center gap-12">
-            <Card className="relative rounded-xl border-border/20 bg-muted/20 p-1.5 sm:-rotate-1">
+            <Card className="relative rounded-xl corner-squircle border-border/20 bg-muted/20 p-1.5 sm:-rotate-1">
               <CardContent className="p-0">
                 <Image
                   width={320}
                   height={320}
-                  className="rounded-lg max-w-[320px] md:max-w-[280px] lg:max-w-[320px] object-center border-2 border-background/10 shadow-md"
+                  className="rounded-lg corner-squircle max-w-[320px] md:max-w-[280px] lg:max-w-[320px] object-center border-2 border-background/10 shadow-md"
                   // Ideally, load from a statically generated image for better SEO performance (import userImage from "@/public/userImage.png")
                   // If you're using a static image, add placeholder="blur"
                   src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2488&q=80"

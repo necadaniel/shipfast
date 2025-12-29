@@ -113,12 +113,12 @@ const Tabs = () => {
   return (
     <section className="max-w-lg mx-auto">
       <ShadcnTabs defaultValue={tabs[0].id} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-muted p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-3 bg-muted p-1 rounded-xl corner-squircle">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
               value={tab.id}
-              className="flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground"
+              className="flex items-center justify-center gap-2 rounded-lg corner-squircle py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground"
             >
               {tab.icon}
               {tab.title}

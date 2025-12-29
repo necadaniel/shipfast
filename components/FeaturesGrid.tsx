@@ -30,7 +30,7 @@ const features = [
         <div className="relative flex items-center gap-8">
           {/* Your device */}
           <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-2xl bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_6px_16px_rgba(0,0,0,0.4)] flex items-center justify-center backdrop-blur-sm">
+            <div className="w-16 h-16 rounded-2xl corner-squircle bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_6px_16px_rgba(0,0,0,0.4)] flex items-center justify-center backdrop-blur-sm">
               <Smartphone className="w-8 h-8 text-primary" />
             </div>
             <span className="text-xs font-medium text-muted-foreground">
@@ -40,7 +40,7 @@ const features = [
 
           {/* Encrypted data flow */}
           <div className="flex flex-col items-center gap-2 flex-1">
-            <div className="relative h-1 w-32 bg-primary/20 rounded-full overflow-hidden">
+            <div className="relative h-1 w-32 bg-primary/20 rounded-full corner-squircle overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary to-transparent animate-[shimmer_2s_ease-in-out_infinite]" />
             </div>
             <Badge
@@ -53,7 +53,7 @@ const features = [
 
           {/* Cloud */}
           <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-2xl bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_6px_16px_rgba(0,0,0,0.4)] flex items-center justify-center backdrop-blur-sm">
+            <div className="w-16 h-16 rounded-2xl corner-squircle bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_6px_16px_rgba(0,0,0,0.4)] flex items-center justify-center backdrop-blur-sm">
               <Shield className="w-8 h-8 text-primary" />
             </div>
             <span className="text-xs font-medium text-muted-foreground">
@@ -63,7 +63,7 @@ const features = [
         </div>
 
         {/* Code snippet overlay */}
-        <div className="absolute bottom-4 right-4 px-3 py-2 rounded-lg bg-background/90 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_3px_12px_rgba(0,0,0,0.3)] backdrop-blur-sm font-mono text-xs text-muted-foreground">
+        <div className="absolute bottom-4 right-4 px-3 py-2 rounded-lg corner-squircle bg-background/90 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_3px_12px_rgba(0,0,0,0.3)] backdrop-blur-sm font-mono text-xs text-muted-foreground">
           <span className="text-primary">AES-256-GCM</span>
         </div>
       </div>
@@ -85,7 +85,7 @@ const features = [
           ].map((device, i) => (
             <div
               key={i}
-              className="flex items-center justify-between p-3 rounded-lg bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_6px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_2px_8px_rgba(0,0,0,0.3)] backdrop-blur-sm group-hover:shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_3px_10px_rgba(0,0,0,0.15)] dark:group-hover:shadow-[0_1px_0_0_rgba(255,255,255,0.08)_inset,0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-300"
+              className="flex items-center justify-between p-3 rounded-lg corner-squircle bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_6px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_2px_8px_rgba(0,0,0,0.3)] backdrop-blur-sm group-hover:shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_3px_10px_rgba(0,0,0,0.15)] dark:group-hover:shadow-[0_1px_0_0_rgba(255,255,255,0.08)_inset,0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-300"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{device.icon}</span>
@@ -111,13 +111,13 @@ const features = [
     demo: (
       <div className="relative h-full flex items-center justify-center px-6">
         {/* Terminal mockup */}
-        <div className="w-full max-w-sm rounded-lg bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_16px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_6px_20px_rgba(0,0,0,0.4)] overflow-hidden">
+        <div className="w-full max-w-sm rounded-lg corner-squircle bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_16px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_6px_20px_rgba(0,0,0,0.4)] overflow-hidden">
           {/* Terminal header */}
           <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b border-border/40">
             <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500/80" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+              <div className="w-3 h-3 rounded-full corner-squircle bg-red-500/80" />
+              <div className="w-3 h-3 rounded-full corner-squircle bg-yellow-500/80" />
+              <div className="w-3 h-3 rounded-full corner-squircle bg-green-500/80" />
             </div>
             <span className="text-xs text-muted-foreground font-mono ml-2">
               terminal
@@ -170,10 +170,10 @@ const features = [
           ].map((project, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_3px_12px_rgba(0,0,0,0.3)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_1px_0_0_rgba(255,255,255,0.08)_inset,0_6px_16px_rgba(0,0,0,0.4)] transition-all duration-300 cursor-pointer group"
+              className="p-4 rounded-xl corner-squircle bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_3px_12px_rgba(0,0,0,0.3)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_1px_0_0_rgba(255,255,255,0.08)_inset,0_6px_16px_rgba(0,0,0,0.4)] transition-all duration-300 cursor-pointer group"
             >
               <div
-                className={`w-10 h-10 rounded-lg ${project.color} flex items-center justify-center mb-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]`}
+                className={`w-10 h-10 rounded-lg corner-squircle ${project.color} flex items-center justify-center mb-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]`}
               >
                 <Layers className="w-5 h-5" />
               </div>
@@ -200,7 +200,7 @@ const FeaturesGrid = () => {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full corner-squircle bg-primary/10 text-primary mb-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
             <Zap className="w-4 h-4" />
             <span className="text-sm font-medium">Powerful Features</span>
           </div>
@@ -223,7 +223,7 @@ const FeaturesGrid = () => {
             <div
               key={i}
               className={`
-                group relative rounded-2xl overflow-hidden
+                group relative rounded-2xl corner-squircle overflow-hidden
                 ${feature.styles}
                 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_16px_rgba(0,0,0,0.08)]
                 dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_6px_20px_rgba(0,0,0,0.3)]
@@ -241,7 +241,7 @@ const FeaturesGrid = () => {
               <div className="relative z-10 p-6 lg:p-8 flex flex-col h-full min-h-[24rem]">
                 {/* Icon & Text */}
                 <div className="mb-6">
-                  <div className="inline-flex p-3 rounded-xl bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_6px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_2px_8px_rgba(0,0,0,0.3)] mb-4 backdrop-blur-sm">
+                  <div className="inline-flex p-3 rounded-xl corner-squircle bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_6px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_2px_8px_rgba(0,0,0,0.3)] mb-4 backdrop-blur-sm">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
                   <h3 className="font-bold text-xl lg:text-2xl mb-2 text-foreground">

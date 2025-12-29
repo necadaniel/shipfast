@@ -18,7 +18,7 @@ const Footer = () => {
               href="/#"
               className="inline-flex items-center gap-2 group mb-4"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)]">
+              <div className="w-8 h-8 rounded-lg corner-squircle bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_8px_rgba(0,0,0,0.1)]">
                 <Image
                   src={logo}
                   alt={`${config.appName} logo`}
@@ -42,7 +42,7 @@ const Footer = () => {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-muted hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-[-1px]"
+                className="w-9 h-9 rounded-lg corner-squircle bg-muted hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-[-1px]"
                 aria-label="Twitter"
               >
                 <Twitter className="w-4 h-4" />
@@ -51,7 +51,7 @@ const Footer = () => {
                 href="https://github.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-muted hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-[-1px]"
+                className="w-9 h-9 rounded-lg corner-squircle bg-muted hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-[-1px]"
                 aria-label="GitHub"
               >
                 <Github className="w-4 h-4" />
@@ -60,7 +60,7 @@ const Footer = () => {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-muted hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-[-1px]"
+                className="w-9 h-9 rounded-lg corner-squircle bg-muted hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-[-1px]"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="w-4 h-4" />
@@ -109,7 +109,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="https://docs.envsync.com"
+                  href="https://docs.changeme.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"

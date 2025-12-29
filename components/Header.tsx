@@ -58,7 +58,7 @@ const Header = () => {
             href="/"
             title={`${config.appName} homepage`}
           >
-            <div className="relative p-1 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] transition-all group-hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_2px_8px_rgba(99,102,241,0.2)] dark:group-hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_2px_12px_rgba(99,102,241,0.3)]">
+            <div className="relative p-1 rounded-lg corner-squircle bg-gradient-to-br from-primary/10 to-primary/5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] transition-all group-hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_2px_8px_rgba(99,102,241,0.2)] dark:group-hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_2px_12px_rgba(99,102,241,0.3)]">
               <Image
                 src={logo}
                 alt={`${config.appName} logo`}
@@ -79,7 +79,7 @@ const Header = () => {
         <div className="flex lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="rounded-lg">
+              <Button variant="ghost" size="sm" className="rounded-lg corner-squircle">
                 <span className="sr-only">Open main menu</span>
                 <Menu className="w-5 h-5" />
               </Button>
@@ -96,7 +96,7 @@ const Header = () => {
                   href="/"
                   onClick={() => setIsOpen(false)}
                 >
-                  <div className="relative p-1 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+                  <div className="relative p-1 rounded-lg corner-squircle bg-gradient-to-br from-primary/10 to-primary/5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
                     <Image
                       src={logo}
                       alt={`${config.appName} logo`}
@@ -119,7 +119,7 @@ const Header = () => {
                   <Link
                     href={link.href}
                     key={link.href}
-                    className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200 w-full py-3 px-4 rounded-lg"
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200 w-full py-3 px-4 rounded-lg corner-squircle"
                     title={link.label}
                     onClick={() => setIsOpen(false)}
                   >

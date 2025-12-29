@@ -19,7 +19,7 @@ const Pricing = () => {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full corner-squircle bg-primary/10 text-primary mb-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
             <Sparkles className="w-4 h-4" />
             <span className="text-sm font-medium">Simple Pricing</span>
           </div>
@@ -57,7 +57,7 @@ const Pricing = () => {
               {/* Card */}
               <div
                 className={`
-                relative flex flex-col h-full rounded-2xl overflow-hidden
+                relative flex flex-col h-full rounded-2xl corner-squircle overflow-hidden
                 ${
                   plan.isFeatured
                     ? "bg-gradient-to-br from-primary/10 via-background to-background"
@@ -118,7 +118,7 @@ const Pricing = () => {
                         <li key={i} className="flex items-start gap-3">
                           <div
                             className={`
-                            mt-0.5 p-1 rounded-md shrink-0
+                            mt-0.5 p-1 rounded-md corner-squircle shrink-0
                             ${
                               plan.isFeatured
                                 ? "bg-primary/20 text-primary"

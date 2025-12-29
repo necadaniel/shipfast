@@ -251,7 +251,7 @@ const VideoTestimonial = ({ i }: { i: number }) => {
       <div className="relative w-full">
         {isLoading && (
           <div className="z-40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="w-24 h-24 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
+            <div className="w-24 h-24 border-4 border-muted border-t-primary rounded-full corner-squircle animate-spin"></div>
           </div>
         )}
         <video

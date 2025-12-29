@@ -11,13 +11,13 @@ export default function Custom404() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
 
       {/* Gradient Orbs */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse [animation-delay:1s]" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse corner-squircle" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse [animation-delay:1s] corner-squircle" />
 
       {/* Content */}
       <div className="relative z-10 max-w-2xl mx-auto text-center space-y-8">
         {/* 404 Icon */}
-        <div className="inline-flex items-center justify-center w-32 h-32 rounded-2xl bg-gradient-to-br from-muted/50 via-muted/30 to-muted/50 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.12)] mb-4">
+        <div className="inline-flex items-center justify-center w-32 h-32 rounded-2xl bg-gradient-to-br from-muted/50 via-muted/30 to-muted/50 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_8px_32px_rgba(0,0,0,0.12)] mb-4 corner-squircle">
           <AlertCircle className="w-16 h-16 text-primary" />
         </div>
         {/* Error Code */}
@@ -60,10 +60,10 @@ export default function Custom404() {
 
         {/* Help Text */}
         <div className="pt-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/30 border border-border/50 text-sm text-muted-foreground">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/30 border border-border/50 text-sm text-muted-foreground corner-squircle">
             <span>Need help?</span>
             <Link
-              href="mailto:support@envsync.com"
+              href="mailto:support@changeme.com"
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Contact Support

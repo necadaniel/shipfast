@@ -4,17 +4,17 @@ import { ConfigProps } from "./types/config";
 const themes = {
   light: {
     primary: "oklch(0.205 0 0)", // --primary from globals.css
-  }
+  },
 };
 
 const config = {
   // REQUIRED
-  appName: "EnvSync",
+  appName: "ChangeMe",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
     "Securely sync your environment variables across all devices with end-to-end encryption. Never share secrets through Slack or email again.",
   // REQUIRED (no https://, not trailing slash at the end, just the naked domain)
-  domainName: "envsync.app",
+  domainName: "changeme.com",
   // Plan limits
   plans: {
     free: {
@@ -116,9 +116,9 @@ const config = {
   },
   resend: {
     // REQUIRED — Email 'From' field to be used when sending magic login links
-    fromNoReply: `EnvSync <noreply@resend.envsync.app>`,
+    fromNoReply: `ChangeMe <noreply@resend.ChangeMe.app>`,
     // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
-    fromAdmin: `Daniel at EnvSync <daniel@resend.envsync.app>`,
+    fromAdmin: `Daniel at ChangeMe <daniel@resend.ChangeMe.app>`,
     // Email shown to customer if they need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
     supportEmail: "neca.danii@gmail.com",
   },

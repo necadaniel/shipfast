@@ -20,8 +20,8 @@ const ButtonPopover = () => {
         align="start"
       >
         <div className="relative grid gap-4 p-4 lg:grid-cols-2">
-          <div className="text-sm flex items-center gap-3 p-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors duration-200">
-            <span className="flex items-center justify-center w-12 h-12 shrink-0 rounded-lg bg-orange-500/20">
+          <div className="text-sm flex items-center gap-3 p-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-lg corner-squircle transition-colors duration-200">
+            <span className="flex items-center justify-center w-12 h-12 shrink-0 rounded-lg corner-squircle bg-orange-500/20">
               <Flame className="w-6 h-6 text-orange-600" />
             </span>
             <div>
@@ -32,8 +32,8 @@ const ButtonPopover = () => {
             </div>
           </div>
           
-          <div className="text-sm flex items-center gap-3 p-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors duration-200">
-            <span className="flex items-center justify-center w-12 h-12 shrink-0 rounded-lg bg-yellow-500/20">
+          <div className="text-sm flex items-center gap-3 p-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-lg corner-squircle transition-colors duration-200">
+            <span className="flex items-center justify-center w-12 h-12 shrink-0 rounded-lg corner-squircle bg-yellow-500/20">
               <Gift className="w-6 h-6 text-yellow-600" />
             </span>
             <div>
@@ -44,8 +44,8 @@ const ButtonPopover = () => {
             </div>
           </div>
           
-          <div className="text-sm flex items-center gap-3 p-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors duration-200">
-            <span className="flex items-center justify-center w-12 h-12 shrink-0 rounded-lg bg-green-500/20">
+          <div className="text-sm flex items-center gap-3 p-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-lg corner-squircle transition-colors duration-200">
+            <span className="flex items-center justify-center w-12 h-12 shrink-0 rounded-lg corner-squircle bg-green-500/20">
               <GraduationCap className="w-6 h-6 text-green-600" />
             </span>
             <div>

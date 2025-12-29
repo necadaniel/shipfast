@@ -110,7 +110,7 @@ const Item = ({
 // Video are set to autoplay for best UX.
 const Media = ({ feature }: { feature: Feature }) => {
   const { type, path, format, alt } = feature;
-  const style = "rounded-2xl aspect-square w-full sm:w-[26rem]";
+  const style = "rounded-2xl corner-squircle aspect-square w-full sm:w-[26rem]";
   const size = {
     width: 500,
     height: 500,

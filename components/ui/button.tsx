@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:focus-visible:ring-offset-background",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg corner-squircle text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:focus-visible:ring-offset-background",
   {
     variants: {
       variant: {
@@ -23,8 +23,8 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-5 py-2.5 has-[>svg]:px-4",
-        sm: "h-9 rounded-lg gap-1.5 px-3.5 has-[>svg]:px-3",
-        lg: "h-11 rounded-lg px-7 has-[>svg]:px-5 text-base",
+        sm: "h-9 rounded-lg corner-squircle gap-1.5 px-3.5 has-[>svg]:px-3",
+        lg: "h-11 rounded-lg corner-squircle px-7 has-[>svg]:px-5 text-base",
         icon: "size-10",
       },
     },

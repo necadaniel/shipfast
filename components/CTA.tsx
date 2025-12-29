@@ -12,14 +12,14 @@ const CTA = () => {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]" />
 
       {/* Gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl opacity-20 animate-pulse" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl opacity-20 animate-pulse corner-squircle" />
       <div
-        className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl opacity-20 animate-pulse"
+        className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl opacity-20 animate-pulse corner-squircle"
         style={{ animationDelay: "1s" }}
       />
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_20px_60px_rgba(0,0,0,0.2)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_24px_80px_rgba(0,0,0,0.5)]">
+        <div className="relative rounded-3xl corner-squircle overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_20px_60px_rgba(0,0,0,0.2)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_24px_80px_rgba(0,0,0,0.5)]">
           {/* Inner glow */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" />
 
@@ -46,19 +46,19 @@ const CTA = () => {
 
               {/* Feature highlights */}
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-8">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg corner-squircle bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
                   <Lock className="w-4 h-4 text-white" />
                   <span className="text-sm font-medium text-white">
                     Zero-Knowledge
                   </span>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg corner-squircle bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
                   <Zap className="w-4 h-4 text-white" />
                   <span className="text-sm font-medium text-white">
                     Real-time Sync
                   </span>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg corner-squircle bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
                   <Shield className="w-4 h-4 text-white" />
                   <span className="text-sm font-medium text-white">
                     AES-256 Encrypted
@@ -94,7 +94,7 @@ const CTA = () => {
               ].map((stat, i) => (
                 <div
                   key={i}
-                  className="flex flex-col items-center lg:items-end px-8 py-6 rounded-2xl bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_4px_12px_rgba(0,0,0,0.1)] min-w-[140px]"
+                  className="flex flex-col items-center lg:items-end px-8 py-6 rounded-2xl corner-squircle bg-white/10 backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_4px_12px_rgba(0,0,0,0.1)] min-w-[140px]"
                 >
                   <div className="text-4xl lg:text-5xl font-bold text-white mb-1 tabular-nums">
                     {stat.value}
@@ -119,9 +119,9 @@ const CTA = () => {
           <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
             {/* You can add company logos here */}
             <div className="text-muted-foreground font-semibold">Startups</div>
-            <div className="w-1 h-1 rounded-full bg-muted-foreground" />
+            <div className="w-1 h-1 rounded-full corner-squircle bg-muted-foreground" />
             <div className="text-muted-foreground font-semibold">Agencies</div>
-            <div className="w-1 h-1 rounded-full bg-muted-foreground" />
+            <div className="w-1 h-1 rounded-full corner-squircle bg-muted-foreground" />
             <div className="text-muted-foreground font-semibold">
               Enterprises
             </div>

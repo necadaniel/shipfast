@@ -17,15 +17,15 @@ const Hero = () => {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
 
       {/* Gradient orbs for depth */}
-      <div className="absolute top-1/4 -left-48 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-20 animate-pulse" />
-      <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-20 animate-pulse delay-1000" />
+      <div className="absolute top-1/4 -left-48 w-96 h-96 bg-primary/20 rounded-full corner-squircle blur-3xl opacity-20 animate-pulse" />
+      <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-primary/20 rounded-full corner-squircle blur-3xl opacity-20 animate-pulse delay-1000" />
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <div className="flex flex-col gap-8 text-center lg:text-left">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 self-center lg:self-start px-4 py-2 rounded-full bg-primary/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 self-center lg:self-start px-4 py-2 rounded-full corner-squircle bg-primary/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] backdrop-blur-sm">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-foreground">
                 Zero-Knowledge Security
@@ -49,15 +49,15 @@ const Hero = () => {
 
             {/* Feature Pills */}
             <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_1px_3px_rgba(0,0,0,0.3)] backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg corner-squircle bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_1px_3px_rgba(0,0,0,0.3)] backdrop-blur-sm">
                 <Lock className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium">AES-256 Encrypted</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_1px_3px_rgba(0,0,0,0.3)] backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg corner-squircle bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_1px_3px_rgba(0,0,0,0.3)] backdrop-blur-sm">
                 <Zap className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium">Real-time Sync</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_1px_3px_rgba(0,0,0,0.3)] backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg corner-squircle bg-background/60 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_1px_3px_rgba(0,0,0,0.3)] backdrop-blur-sm">
                 <Shield className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium">Zero-Knowledge</span>
               </div>
@@ -109,7 +109,7 @@ const Hero = () => {
           {/* Right Content - Interactive Card */}
           <div className="relative">
             {/* Floating card with code preview */}
-            <div className="relative rounded-2xl bg-gradient-to-br from-background to-accent/20 p-8 shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_12px_48px_rgba(0,0,0,0.4)] backdrop-blur-sm">
+            <div className="relative rounded-2xl corner-squircle bg-gradient-to-br from-background to-accent/20 p-8 shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_12px_48px_rgba(0,0,0,0.4)] backdrop-blur-sm">
               {/* Code block mockup */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-4 border-b border-border/40">
@@ -117,9 +117,9 @@ const Hero = () => {
                     .env.local
                   </span>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                    <div className="w-3 h-3 rounded-full corner-squircle bg-red-500/80" />
+                    <div className="w-3 h-3 rounded-full corner-squircle bg-yellow-500/80" />
+                    <div className="w-3 h-3 rounded-full corner-squircle bg-green-500/80" />
                   </div>
                 </div>
 
@@ -167,17 +167,17 @@ const Hero = () => {
               </div>
 
               {/* Floating device badges */}
-              <div className="absolute -right-4 -top-4 px-4 py-2 rounded-lg bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_6px_16px_rgba(0,0,0,0.4)]">
+              <div className="absolute -right-4 -top-4 px-4 py-2 rounded-lg corner-squircle bg-background shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_6px_16px_rgba(0,0,0,0.4)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full corner-squircle bg-green-500 animate-pulse" />
                   <span className="text-xs font-medium">Live Sync</span>
                 </div>
               </div>
             </div>
 
             {/* Decorative elements */}
-            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-primary/20 rounded-full blur-2xl opacity-50" />
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-primary/20 rounded-full blur-2xl opacity-50" />
+            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-primary/20 rounded-full corner-squircle blur-2xl opacity-50" />
+            <div className="absolute -top-6 -right-6 w-32 h-32 bg-primary/20 rounded-full corner-squircle blur-2xl opacity-50" />
           </div>
         </div>
       </div>
