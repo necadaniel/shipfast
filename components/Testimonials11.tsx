@@ -1,11 +1,8 @@
 "use client";
 
 import { JSX, useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { StaticImageData } from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Play, Pause, Star } from "lucide-react";
 import config from "@/config";
 
 // Use this object to add an icon to the testimonial (optional) like the Product Hunt logo for instance.
@@ -82,12 +79,18 @@ const list: {
   videoType?: "video/ogg" | "video/mp4" | "video/webm";
 }[] = [
   {
+    // Show @username for social media like Twitter. Does not link anywhere but cool to display
     username: "marclou",
     name: "Marc Lou",
     text: "Really easy to use. The tutorials are really useful and explains how everything works. Hope to ship my next project really fast!",
+    // use refTypes.other if you don't want to display an icon
     type: refTypes.twitter,
+    // Link to the person's testimonial. It's more trustable
     link: "https://twitter.com/marc_louvion",
+    // A statically imported image (usually from your public folder—recommended) or a link to the person's avatar. Shows a fallback letter if not provided
     img: "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_400x400.jpg",
+    // You can display video testimonials to build more trust. Just swap the type above to "video" and add at least the video source below
+    // videoSrc: "/jack.mp4"
   },
   {
     username: "the_mcnaveen",
@@ -159,7 +162,7 @@ const list: {
   },
 ];
 
-// A single testimonial, to be rendered in a list
+// A single testimonial, to be rendered in  a list
 const Testimonial = ({ i }: { i: number }) => {
   const testimonial = list[i];
 
@@ -171,56 +174,58 @@ const Testimonial = ({ i }: { i: number }) => {
 
   return (
     <li key={i}>
-      <Card className="relative h-full bg-background border-border">
-        <CardContent className="p-6">
-          <blockquote className="relative">
-            <p className="text-sm text-muted-foreground">{testimonial.text}</p>
-          </blockquote>
-          <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-border/20">
-            <Avatar className="w-10 h-10 shrink-0">
-              {testimonial.img && (
-                <AvatarImage
-                  src={typeof testimonial.img === 'string' ? testimonial.img : testimonial.img.src}
-                  alt={`${testimonial.name}'s testimonial for ${config.appName}`}
-                />
-              )}
-              <AvatarFallback className="bg-muted text-foreground text-lg font-medium">
+      <figure className="relative h-full p-6 bg-base-100 rounded-lg">
+        <blockquote className="relative">
+          <p className="text-sm text-base-content/80">{testimonial.text}</p>
+        </blockquote>
+        <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-base-content/5">
+          <div className="overflow-hidden rounded-full bg-base-300 shrink-0">
+            {testimonial.img ? (
+              <Image
+                className="w-10 h-10 rounded-full object-cover"
+                src={list[i].img}
+                alt={`${list[i].name}'s testimonial for ${config.appName}`}
+                width={48}
+                height={48}
+              />
+            ) : (
+              <span className="w-10 h-10 rounded-full flex justify-center items-center text-lg font-medium bg-base-300">
                 {testimonial.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="w-full flex items-end justify-between gap-2">
-              <div>
-                <div className="text-sm font-medium text-foreground">
-                  {testimonial.name}
-                </div>
-                {testimonial.username && (
-                  <div className="mt-0.5 text-sm text-muted-foreground">
-                    @{testimonial.username}
-                  </div>
-                )}
+              </span>
+            )}
+          </div>
+          <div className="w-full flex items-end justify-between gap-2">
+            <div>
+              <div className="text-sm font-medium text-base-content">
+                {testimonial.name}
               </div>
-
-              {testimonial.link && testimonial.type?.svg && (
-                <a
-                  href={testimonial.link}
-                  target="_blank"
-                  className="shrink-0"
-                  aria-label={testimonial.type?.ariaLabel}
-                >
-                  {testimonial.type?.svg}
-                </a>
+              {testimonial.username && (
+                <div className="mt-0.5 text-sm text-base-content/80">
+                  @{testimonial.username}
+                </div>
               )}
             </div>
-          </figcaption>
-        </CardContent>
-      </Card>
+
+            {testimonial.link && testimonial.type?.svg && (
+              <a
+                href={testimonial.link}
+                target="_blank"
+                className="shrink-0 "
+                aria-label={testimonial.type?.ariaLabel}
+              >
+                {testimonial.type?.svg}
+              </a>
+            )}
+          </div>
+        </figcaption>
+      </figure>
     </li>
   );
 };
 
-// A video testimonial to build trust. 2 or 3 on a wall of love is perfect.
+// A video tesionial to build trust. 2 or 3 on a wall of love is perfect.
 const VideoTestimonial = ({ i }: { i: number }) => {
-  const vidRef = useRef<HTMLVideoElement>(null);
+  const vidRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -232,10 +237,10 @@ const VideoTestimonial = ({ i }: { i: number }) => {
 
   const handlePlayVideo = () => {
     if (isPlaying) {
-      vidRef.current?.pause();
+      vidRef.current.pause();
       setIsPlaying(false);
     } else {
-      vidRef.current?.play();
+      vidRef.current.play();
       setIsPlaying(true);
 
       if (vidRef.current?.readyState === 0) setIsLoading(true);
@@ -247,12 +252,13 @@ const VideoTestimonial = ({ i }: { i: number }) => {
   if (!testimonial) return null;
 
   return (
-    <Card className="break-inside-avoid max-md:flex justify-center bg-background border-border overflow-hidden flex flex-col">
+    <li
+      key={i}
+      className="break-inside-avoid max-md:flex justify-center bg-base-100 rounded-lg overflow-hidden flex flex-col"
+    >
       <div className="relative w-full">
         {isLoading && (
-          <div className="z-40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="w-24 h-24 border-4 border-muted border-t-primary rounded-full corner-squircle animate-spin"></div>
-          </div>
+          <span className="z-40 !h-24 !w-24 !bg-gray-50 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-ring"></span>
         )}
         <video
           className="w-full"
@@ -275,38 +281,69 @@ const VideoTestimonial = ({ i }: { i: number }) => {
         </video>
 
         {!isPlaying && (
-          <div className="absolute bottom-0 -inset-x-4 bg-black/50 blur-lg h-24 translate-y-1/4 animate-in fade-in duration-300"></div>
+          <div className="absolute bottom-0 -inset-x-4 bg-gray-900/50 blur-lg h-24 translate-y-1/4 animate-opacity"></div>
         )}
 
         <div className="absolute w-full bottom-0 z-20">
           <div className="flex justify-between items-end p-4">
-            <Button
-              variant="ghost"
-              size="lg"
-              className="group cursor-pointer p-2 hover:bg-transparent"
+            <button
+              className="group cursor-pointer"
               type="button"
               title="Play video"
               aria-label="Play video"
               onClick={handlePlayVideo}
             >
               {isPlaying ? (
-                <Pause className="w-14 h-14 text-white group-hover:scale-[1.05] duration-100 ease-in drop-shadow-lg" />
+                // PAUSE
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className=" w-14 h-14 fill-gray-50 group-hover:scale-[1.05] duration-100 ease-in drop-shadow-lg animate-opacity"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               ) : (
-                <Play className="w-14 h-14 text-white group-hover:scale-[1.05] duration-100 ease-in drop-shadow-lg" />
+                // PLAY
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-14 h-14 fill-gray-50 group-hover:scale-[1.05] duration-100 ease-in drop-shadow-lg animate-opacity"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               )}
-            </Button>
+            </button>
 
             {!isPlaying && (
-              <div className="animate-in fade-in duration-300 text-right">
-                <p className="text-white font-medium drop-shadow">
+              <div className="animate-opacity text-right">
+                <p className="text-gray-50 font-medium drop-shadow">
                   {testimonial.name}
                 </p>
-                <div className="flex">
-                  {[...Array(5)].map((_, starIndex) => (
-                    <Star
-                      key={starIndex}
-                      className="w-5 h-5 fill-yellow-400 text-yellow-400 drop-shadow"
-                    />
+                <div className="rating">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-5 h-5 text-accent drop-shadow"
+                      key={i}
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
                   ))}
                 </div>
               </div>
@@ -315,24 +352,24 @@ const VideoTestimonial = ({ i }: { i: number }) => {
         </div>
       </div>
 
-      <CardContent className="relative z-20 bg-primary text-primary-foreground text-base leading-tight font-medium p-4 select-none">
+      <div className="relative z-20 bg-accent text-accent-content text-base leading-tight font-medium p-4 select-none">
         <p>&quot;{testimonial.text}&quot;</p>
-      </CardContent>
-    </Card>
+      </div>
+    </li>
   );
 };
 
 const Testimonials11 = () => {
   return (
-    <section className="bg-muted" id="testimonials">
+    <section className="bg-base-200" id="testimonials">
       <div className="py-24 px-8 max-w-7xl mx-auto">
         <div className="flex flex-col text-center w-full mb-20">
           <div className="mb-8">
-            <h2 className="sm:text-5xl text-4xl font-extrabold text-foreground">
+            <h2 className="sm:text-5xl text-4xl font-extrabold text-base-content">
               212 makers are already shipping faster!
             </h2>
           </div>
-          <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-muted-foreground">
+          <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-base-content/80">
             Don&apos;t take our word for it. Here&apos;s what they have to say
             about {config.appName}.
           </p>
@@ -352,38 +389,46 @@ const Testimonials11 = () => {
 
           <li className="hidden md:grid order-none md:order-first lg:order-none col-span-2 grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {/* BIG FEATURED TESTIMONIAL — THE LAST ONE IN THE LIST (11th) */}
-            <Card className="col-span-2 bg-background border-border">
-              <CardContent className="relative h-full p-6">
-                <blockquote className="relative p-4">
-                  <p className="text-lg font-medium text-foreground">
-                    {list[list.length - 1].text}
-                  </p>
-                </blockquote>
-                <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-border/20">
-                  <Avatar className="w-12 h-12 shrink-0">
-                    {list[list.length - 1].img && (
-                      <AvatarImage
-                        src={typeof list[list.length - 1].img === 'string' ? list[list.length - 1].img : (list[list.length - 1].img as any)?.src}
-                        alt={`${list[list.length - 1].name}'s testimonial for ${config.appName}`}
-                      />
-                    )}
-                    <AvatarFallback className="bg-muted text-foreground text-xl font-medium">
-                      {list[list.length - 1].name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="text-base font-medium text-foreground">
-                      {list[list.length - 1].name}
+            <ul className="col-span-2">
+              <li>
+                <figure className="relative h-full p-6 bg-base-100 rounded-lg">
+                  <blockquote className="relative p-4">
+                    <p className="text-lg font-medium text-base-content">
+                      {list[list.length - 1].text}
+                    </p>
+                  </blockquote>
+                  <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-base-content/5">
+                    <div className="overflow-hidden rounded-full bg-base-300 shrink-0">
+                      {list[list.length - 1].img ? (
+                        <Image
+                          className="w-12 h-12 rounded-full object-cover"
+                          src={list[list.length - 1].img}
+                          alt={`${
+                            list[list.length - 1].name
+                          }'s testimonial for ${config.appName}`}
+                          width={48}
+                          height={48}
+                        />
+                      ) : (
+                        <span className="w-12 h-12 rounded-full flex justify-center items-center text-xl font-medium bg-base-300">
+                          {list[list.length - 1].name.charAt(0)}
+                        </span>
+                      )}
                     </div>
-                    {list[list.length - 1].username && (
-                      <div className="mt-1 text-base text-muted-foreground">
-                        @{list[list.length - 1].username}
+                    <div>
+                      <div className="text-base font-medium text-base-content">
+                        {list[list.length - 1].name}
                       </div>
-                    )}
-                  </div>
-                </figcaption>
-              </CardContent>
-            </Card>
+                      {list[list.length - 1].username && (
+                        <div className="mt-1 text-base text-base-content/80">
+                          @{list[list.length - 1].username}
+                        </div>
+                      )}
+                    </div>
+                  </figcaption>
+                </figure>
+              </li>
+            </ul>
             <ul role="list" className="flex flex-col gap-y-6 sm:gap-y-8">
               {[...Array(2)].map((e, i) => (
                 <Testimonial key={i} i={i + 3} />

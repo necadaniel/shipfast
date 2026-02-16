@@ -2,18 +2,14 @@
 
 import React, { useState, useRef } from "react";
 import { toast } from "react-hot-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2, ArrowRight } from "lucide-react";
 import apiClient from "@/libs/api";
-import { cn } from "@/lib/utils";
 
 // This component is used to collect the emails from the landing page
 // You'd use this if your product isn't ready yet or you want to collect leads
 // For instance: A popup to send a freebie, joining a waitlist, etc.
 // It calls the /api/lead/route.js route and store a Lead document in the database
 const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef(null);
   const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -28,7 +24,7 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
       toast.success("Thanks for joining the waitlist!");
 
       // just remove the focus on the input
-      inputRef.current?.blur();
+      inputRef.current.blur();
       setEmail("");
       setIsDisabled(true);
     } catch (error) {
@@ -37,36 +33,45 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
       setIsLoading(false);
     }
   };
-
   return (
     <form
-      className={cn("w-full max-w-xs space-y-3", extraStyle)}
+      className={`w-full max-w-xs space-y-3 ${extraStyle ? extraStyle : ""}`}
       onSubmit={handleSubmit}
     >
-      <Input
+      <input
         required
         type="email"
         value={email}
         ref={inputRef}
         autoComplete="email"
         placeholder="tom@cruise.com"
-        className="placeholder:opacity-60"
+        className="input input-bordered w-full placeholder:opacity-60"
         onChange={(e) => setEmail(e.target.value)}
-        disabled={isDisabled}
       />
 
-      <Button
-        className="w-full gap-2"
+      <button
+        className="btn btn-primary btn-block"
         type="submit"
-        disabled={isDisabled || isLoading}
+        disabled={isDisabled}
       >
         Join waitlist
         {isLoading ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <span className="loading loading-spinner loading-xs"></span>
         ) : (
-          <ArrowRight className="w-5 h-5" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z"
+              clipRule="evenodd"
+            />
+          </svg>
         )}
-      </Button>
+      </button>
     </form>
   );
 };

@@ -4,8 +4,6 @@
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import config from "@/config";
 
 // A simple button to sign in with our providers (Google & Magic Links).
@@ -31,35 +29,36 @@ const ButtonSignin = ({
 
   if (status === "authenticated") {
     return (
-      <Button asChild className={cn("gap-2", extraStyle)}>
-        <Link href={config.auth.callbackUrl}>
-          {session.user?.image ? (
-            <img
-              src={session.user?.image}
-              alt={session.user?.name || "Account"}
-              className="w-6 h-6 rounded-full corner-squircle shrink-0"
-              referrerPolicy="no-referrer"
-              width={24}
-              height={24}
-            />
-          ) : (
-            <div className="w-6 h-6 bg-muted flex justify-center items-center rounded-full corner-squircle shrink-0">
-              {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
-            </div>
-          )}
-          {session.user?.name || session.user?.email || "Account"}
-        </Link>
-      </Button>
+      <Link
+        href={config.auth.callbackUrl}
+        className={`btn ${extraStyle ? extraStyle : ""}`}
+      >
+        {session.user?.image ? (
+          <img
+            src={session.user?.image}
+            alt={session.user?.name || "Account"}
+            className="w-6 h-6 rounded-full shrink-0"
+            referrerPolicy="no-referrer"
+            width={24}
+            height={24}
+          />
+        ) : (
+          <span className="w-6 h-6 bg-base-300 flex justify-center items-center rounded-full shrink-0">
+            {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
+          </span>
+        )}
+        {session.user?.name || session.user?.email || "Account"}
+      </Link>
     );
   }
 
   return (
-    <Button
-      className={cn("", extraStyle)}
+    <button
+      className={`btn ${extraStyle ? extraStyle : ""}`}
       onClick={handleClick}
     >
       {text}
-    </Button>
+    </button>
   );
 };
 
