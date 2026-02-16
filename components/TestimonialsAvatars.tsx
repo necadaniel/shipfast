@@ -1,12 +1,8 @@
 import Image from "next/image";
 
-const avatars: {
-  alt: string;
-  src: string;
-}[] = [
+const avatars: { alt: string; src: string }[] = [
   {
     alt: "User",
-    // Ideally, load from a statically generated image for better SEO performance (import userImage from "@/public/userImage.png")
     src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3276&q=80",
   },
   {
@@ -29,32 +25,34 @@ const avatars: {
 
 const TestimonialsAvatars = ({ priority }: { priority?: boolean }) => {
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-3">
-      {/* AVATARS */}
-      <div className={`-space-x-5 avatar-group justy-start`}>
+    <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start">
+      <div className="flex -space-x-3">
         {avatars.map((image, i) => (
-          <div className="avatar w-12 h-12" key={i}>
+          <div
+            className="overflow-hidden rounded-full border-2 border-background bg-muted"
+            key={i}
+          >
             <Image
               src={image.src}
               alt={image.alt}
               priority={priority}
-              width={50}
-              height={50}
+              width={48}
+              height={48}
+              className="size-10 object-cover sm:size-11"
             />
           </div>
         ))}
       </div>
 
-      {/* RATING */}
-      <div className="flex flex-col justify-center items-center md:items-start gap-1">
-        <div className="rating">
+      <div className="space-y-1 text-center sm:text-left">
+        <div className="flex justify-center gap-0.5 sm:justify-start">
           {[...Array(5)].map((_, i) => (
             <svg
+              key={i}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
-              className="w-5 h-5 text-yellow-500"
-              key={i}
+              className="size-4 text-yellow-500"
             >
               <path
                 fillRule="evenodd"
@@ -64,11 +62,10 @@ const TestimonialsAvatars = ({ priority }: { priority?: boolean }) => {
             </svg>
           ))}
         </div>
-
-        <div className="text-base text-base-content/80">
-          <span className="font-semibold text-base-content">32</span> makers
-          ship faster
-        </div>
+        <p className="text-sm text-muted-foreground">
+          <span className="font-semibold text-foreground">32+</span> makers ship
+          faster
+        </p>
       </div>
     </div>
   );

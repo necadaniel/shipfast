@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Project from "../models/Project.js";
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
@@ -13,11 +12,21 @@ async function clearTeamProjectVariables() {
     await mongoose.connect(process.env.MONGODB_URI!);
     console.log("✅ Connected to MongoDB\n");
 
+    const db = mongoose.connection.db;
+    const projectsCollection = db?.collection("projects");
+
+    if (!projectsCollection) {
+      console.error("❌ Could not access projects collection");
+      process.exit(1);
+    }
+
     // Find all team projects with variables
-    const teamProjects = await Project.find({
+    const teamProjects = await projectsCollection
+      .find({
       isTeamProject: true,
       variableCount: { $gt: 0 },
-    });
+      })
+      .toArray();
 
     console.log(
       `Found ${teamProjects.length} team project(s) with variables\n`
@@ -30,9 +39,15 @@ async function clearTeamProjectVariables() {
       console.log(`   Current variable count: ${project.variableCount}`);
 
       // Clear variables
-      project.variables = "[]";
-      project.variableCount = 0;
-      await project.save();
+      await projectsCollection.updateOne(
+        { _id: project._id },
+        {
+          $set: {
+            variables: "[]",
+            variableCount: 0,
+          },
+        }
+      );
 
       console.log(`   ✅ Cleared all variables`);
     }

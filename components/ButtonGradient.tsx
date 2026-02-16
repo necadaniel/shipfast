@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Button } from "@/components/ui/button";
 
 const ButtonGradient = ({
   title = "Gradient Button",
@@ -10,9 +11,12 @@ const ButtonGradient = ({
   onClick?: () => void;
 }) => {
   return (
-    <button className="btn btn-gradient animate-shimmer" onClick={onClick}>
+    <Button
+      className="bg-gradient-to-r from-primary via-indigo-500 to-cyan-500 text-white hover:opacity-95"
+      onClick={onClick}
+    >
       {title}
-    </button>
+    </Button>
   );
 };
 

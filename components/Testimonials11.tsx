@@ -174,12 +174,12 @@ const Testimonial = ({ i }: { i: number }) => {
 
   return (
     <li key={i}>
-      <figure className="relative h-full p-6 bg-base-100 rounded-lg">
+      <figure className="relative h-full p-6 bg-background rounded-lg">
         <blockquote className="relative">
-          <p className="text-sm text-base-content/80">{testimonial.text}</p>
+          <p className="text-sm text-muted-foreground">{testimonial.text}</p>
         </blockquote>
-        <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-base-content/5">
-          <div className="overflow-hidden rounded-full bg-base-300 shrink-0">
+        <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-border/60">
+          <div className="overflow-hidden rounded-full bg-muted shrink-0">
             {testimonial.img ? (
               <Image
                 className="w-10 h-10 rounded-full object-cover"
@@ -189,18 +189,18 @@ const Testimonial = ({ i }: { i: number }) => {
                 height={48}
               />
             ) : (
-              <span className="w-10 h-10 rounded-full flex justify-center items-center text-lg font-medium bg-base-300">
+              <span className="w-10 h-10 rounded-full flex justify-center items-center text-lg font-medium bg-muted">
                 {testimonial.name.charAt(0)}
               </span>
             )}
           </div>
           <div className="w-full flex items-end justify-between gap-2">
             <div>
-              <div className="text-sm font-medium text-base-content">
+              <div className="text-sm font-medium text-foreground">
                 {testimonial.name}
               </div>
               {testimonial.username && (
-                <div className="mt-0.5 text-sm text-base-content/80">
+                <div className="mt-0.5 text-sm text-muted-foreground">
                   @{testimonial.username}
                 </div>
               )}
@@ -254,11 +254,11 @@ const VideoTestimonial = ({ i }: { i: number }) => {
   return (
     <li
       key={i}
-      className="break-inside-avoid max-md:flex justify-center bg-base-100 rounded-lg overflow-hidden flex flex-col"
+      className="break-inside-avoid max-md:flex justify-center bg-background rounded-lg overflow-hidden flex flex-col"
     >
       <div className="relative w-full">
         {isLoading && (
-          <span className="z-40 !h-24 !w-24 !bg-gray-50 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-ring"></span>
+          <span className="absolute top-1/2 left-1/2 z-40 size-14 -translate-x-1/2 -translate-y-1/2 animate-spin rounded-full border-4 border-primary/20 border-t-primary"></span>
         )}
         <video
           className="w-full"
@@ -329,7 +329,7 @@ const VideoTestimonial = ({ i }: { i: number }) => {
                 <p className="text-gray-50 font-medium drop-shadow">
                   {testimonial.name}
                 </p>
-                <div className="rating">
+                <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -361,15 +361,15 @@ const VideoTestimonial = ({ i }: { i: number }) => {
 
 const Testimonials11 = () => {
   return (
-    <section className="bg-base-200" id="testimonials">
+    <section className="bg-muted/30" id="testimonials">
       <div className="py-24 px-8 max-w-7xl mx-auto">
         <div className="flex flex-col text-center w-full mb-20">
           <div className="mb-8">
-            <h2 className="sm:text-5xl text-4xl font-extrabold text-base-content">
+            <h2 className="sm:text-5xl text-4xl font-extrabold text-foreground">
               212 makers are already shipping faster!
             </h2>
           </div>
-          <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-base-content/80">
+          <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-muted-foreground">
             Don&apos;t take our word for it. Here&apos;s what they have to say
             about {config.appName}.
           </p>
@@ -391,14 +391,14 @@ const Testimonials11 = () => {
             {/* BIG FEATURED TESTIMONIAL — THE LAST ONE IN THE LIST (11th) */}
             <ul className="col-span-2">
               <li>
-                <figure className="relative h-full p-6 bg-base-100 rounded-lg">
+                <figure className="relative h-full p-6 bg-background rounded-lg">
                   <blockquote className="relative p-4">
-                    <p className="text-lg font-medium text-base-content">
+                    <p className="text-lg font-medium text-foreground">
                       {list[list.length - 1].text}
                     </p>
                   </blockquote>
-                  <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-base-content/5">
-                    <div className="overflow-hidden rounded-full bg-base-300 shrink-0">
+                  <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-border/60">
+                    <div className="overflow-hidden rounded-full bg-muted shrink-0">
                       {list[list.length - 1].img ? (
                         <Image
                           className="w-12 h-12 rounded-full object-cover"
@@ -410,17 +410,17 @@ const Testimonials11 = () => {
                           height={48}
                         />
                       ) : (
-                        <span className="w-12 h-12 rounded-full flex justify-center items-center text-xl font-medium bg-base-300">
+                        <span className="w-12 h-12 rounded-full flex justify-center items-center text-xl font-medium bg-muted">
                           {list[list.length - 1].name.charAt(0)}
                         </span>
                       )}
                     </div>
                     <div>
-                      <div className="text-base font-medium text-base-content">
+                      <div className="text-base font-medium text-foreground">
                         {list[list.length - 1].name}
                       </div>
                       {list[list.length - 1].username && (
-                        <div className="mt-1 text-base text-base-content/80">
+                        <div className="mt-1 text-base text-muted-foreground">
                           @{list[list.length - 1].username}
                         </div>
                       )}

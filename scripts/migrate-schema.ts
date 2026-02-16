@@ -16,9 +16,6 @@ config({ path: resolve(process.cwd(), ".env.local") });
 import mongoose from "mongoose";
 import connectMongo from "../libs/mongoose";
 import User from "../models/User";
-import Project from "../models/Project";
-import Team from "../models/Team";
-import Lead from "../models/Lead";
 
 interface MigrationConfig {
   model: mongoose.Model<any>;
@@ -110,39 +107,6 @@ async function migrate() {
     results.User = {
       updated: userMigration.updatedCount,
       skipped: userMigration.skippedCount,
-    };
-
-    // ============================================================
-    // PROJECT MIGRATIONS
-    // ============================================================
-    const projectMigration = await runMigration({
-      model: Project,
-      modelName: "Project",
-      updates: (project) => {
-        const updates: any = {};
-        const log: string[] = [];
-        let hasChanges = false;
-
-        // Example: Add teamId field if you want projects to support teams
-        // if (project.teamId === undefined) {
-        //   updates.teamId = null;
-        //   log.push(`Project ${project.name}: Added teamId=null`);
-        //   hasChanges = true;
-        // }
-
-        // Example: Add sharedWith array
-        // if (!project.sharedWith) {
-        //   updates.sharedWith = [];
-        //   log.push(`Project ${project.name}: Added sharedWith=[]`);
-        //   hasChanges = true;
-        // }
-
-        return { updates, hasChanges, log };
-      },
-    });
-    results.Project = {
-      updated: projectMigration.updatedCount,
-      skipped: projectMigration.skippedCount,
     };
 
     // ============================================================

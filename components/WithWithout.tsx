@@ -3,7 +3,7 @@
 // Try to match the lines from left to right, so the user can easily compare the two columns
 const WithWithout = () => {
   return (
-    <section className="bg-base-100">
+    <section className="bg-background">
       <div className="max-w-5xl mx-auto px-8 py-16 md:py-32 ">
         <h2 className="text-center font-extrabold text-3xl md:text-5xl tracking-tight mb-12 md:mb-20">
           Tired of managing Stripe invoices?

@@ -439,7 +439,7 @@ const FeaturesListicle = () => {
   return (
     <section className="py-24" id="features">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-base-100 max-md:px-8 max-w-3xl">
+        <div className="bg-background max-md:px-8 max-w-3xl">
           <p className="text-accent font-medium text-sm font-mono mb-3">
             {/* Pure decoration, you can remove it */}
             const launch_time = &quot;Today&quot;;
@@ -448,7 +448,7 @@ const FeaturesListicle = () => {
             {/* 💡 COPY TIP: Remind visitors about the value of your product. Why do they need it? */}
             Supercharge your app instantly, launch faster, make $
           </h2>
-          <div className="text-base-content/80 leading-relaxed mb-8 lg:text-lg">
+          <div className="text-muted-foreground leading-relaxed mb-8 lg:text-lg">
             {/* 💡 COPY TIP: Explain how your product delivers what you promise in the headline. */}
             Login users, process payments and send emails at lightspeed. Spend
             your time building your startup, not integrating APIs. ShipFast
@@ -472,7 +472,7 @@ const FeaturesListicle = () => {
                 className={`duration-100 ${
                   featureSelected === feature.name
                     ? "text-primary"
-                    : "text-base-content/30 group-hover:text-base-content/50"
+                    : "text-muted-foreground/70 group-hover:text-muted-foreground/80"
                 }`}
               >
                 {feature.svg}
@@ -481,7 +481,7 @@ const FeaturesListicle = () => {
                 className={`font-semibold text-sm ${
                   featureSelected === feature.name
                     ? "text-primary"
-                    : "text-base-content/50"
+                    : "text-muted-foreground/80"
                 }`}
               >
                 {feature.name}
@@ -489,13 +489,13 @@ const FeaturesListicle = () => {
             </span>
           ))}
         </div>
-        <div className="bg-base-200">
+        <div className="bg-muted/30">
           <div className="max-w-3xl mx-auto flex flex-col md:flex-row justify-center md:justify-start md:items-center gap-12">
             <div
-              className="text-base-content/80 leading-relaxed space-y-4 px-12 md:px-0 py-12 max-w-xl animate-opacity"
+              className="text-muted-foreground leading-relaxed space-y-4 px-12 md:px-0 py-12 max-w-xl animate-opacity"
               key={featureSelected}
             >
-              <h3 className="font-semibold text-base-content text-lg">
+              <h3 className="font-semibold text-foreground text-lg">
                 {features.find((f) => f.name === featureSelected)["name"]}
               </h3>
 

@@ -4,9 +4,9 @@ import Image from "next/image";
 // Highlight the outcome for your customer (how did your product changed her/his life?) or the pain it's removing — Use <span className="bg-warning/25 px-1.5"> to highlight a part of the sentence
 const Testimonial1Small = () => {
   return (
-    <section className="bg-base-100">
+    <section className="bg-background">
       <div className="space-y-6 md:space-y-8 max-w-lg mx-auto px-8 py-16 md:py-32 ">
-        <div className="rating !flex justify-center">
+        <div className="flex justify-center gap-0.5">
           {[...Array(5)].map((_, i) => (
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +46,7 @@ const Testimonial1Small = () => {
           />
           <div>
             <p className="font-semibold">Someone Nice</p>
-            <p className="text-base-content/80 text-sm">23.1K followers on 𝕏</p>
+            <p className="text-muted-foreground text-sm">23.1K followers on 𝕏</p>
           </div>
         </div>
       </div>

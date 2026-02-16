@@ -1,10 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import config from "@/config";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 // A simple button to sign in with our providers (Google & Magic Links).
 // It automatically redirects user to callbackUrl (config.auth.callbackUrl) after login, which is normally a private page for users to manage their accounts.
@@ -29,36 +31,28 @@ const ButtonSignin = ({
 
   if (status === "authenticated") {
     return (
-      <Link
-        href={config.auth.callbackUrl}
-        className={`btn ${extraStyle ? extraStyle : ""}`}
-      >
-        {session.user?.image ? (
-          <img
-            src={session.user?.image}
-            alt={session.user?.name || "Account"}
-            className="w-6 h-6 rounded-full shrink-0"
-            referrerPolicy="no-referrer"
-            width={24}
-            height={24}
-          />
-        ) : (
-          <span className="w-6 h-6 bg-base-300 flex justify-center items-center rounded-full shrink-0">
-            {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
-          </span>
-        )}
-        {session.user?.name || session.user?.email || "Account"}
-      </Link>
+      <Button asChild className={cn("gap-2", extraStyle)}>
+        <Link href={config.auth.callbackUrl}>
+          <Avatar className="size-6">
+            <AvatarImage
+              src={session.user?.image || undefined}
+              alt={session.user?.name || "Account"}
+              referrerPolicy="no-referrer"
+            />
+            <AvatarFallback className="text-xs">
+              {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          {session.user?.name || session.user?.email || "Account"}
+        </Link>
+      </Button>
     );
   }
 
   return (
-    <button
-      className={`btn ${extraStyle ? extraStyle : ""}`}
-      onClick={handleClick}
-    >
+    <Button className={cn(extraStyle)} onClick={handleClick}>
       {text}
-    </button>
+    </Button>
   );
 };
 

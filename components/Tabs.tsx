@@ -155,7 +155,7 @@ const Tabs = () => {
 		<section className="max-w-lg mx-auto space-y-4">
 			{/* TAB HEADER */}
 			<div
-				className="grid rounded-xl bg-base-200 p-1"
+				className="grid rounded-xl bg-muted/30 p-1"
 				style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
 			>
 				{tabs.map((tab) => (
@@ -164,8 +164,8 @@ const Tabs = () => {
 						role="tab"
 						className={`flex cursor-pointer select-none items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium ${
 							activeTab === tab.id
-								? "animate-opacity bg-base-100 shadow"
-								: "text-base-content/75"
+								? "animate-opacity bg-background shadow"
+								: "text-muted-foreground"
 						}`}
 						onClick={() => setActiveTab(tab.id)}
 					>
