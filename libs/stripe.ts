@@ -1,5 +1,7 @@
 import Stripe from "stripe";
 
+const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-02-25.clover";
+
 interface CreateCheckoutParams {
   priceId: string;
   mode: "payment" | "subscription";
@@ -30,7 +32,7 @@ export const createCheckout = async ({
 }: CreateCheckoutParams): Promise<string> => {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2023-08-16", // TODO: update this when Stripe updates their API
+      apiVersion: STRIPE_API_VERSION,
       typescript: true,
     });
 
@@ -93,7 +95,7 @@ export const createCustomerPortal = async ({
   returnUrl,
 }: CreateCustomerPortalParams): Promise<string> => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2023-08-16", // TODO: update this when Stripe updates their API
+    apiVersion: STRIPE_API_VERSION,
     typescript: true,
   });
 
@@ -109,7 +111,7 @@ export const createCustomerPortal = async ({
 export const findCheckoutSession = async (sessionId: string) => {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2023-08-16", // TODO: update this when Stripe updates their API
+      apiVersion: STRIPE_API_VERSION,
       typescript: true,
     });
 

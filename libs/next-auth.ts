@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import EmailProvider from "next-auth/providers/email";
+import ResendProvider from "next-auth/providers/resend";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import config from "@/config";
 import connectMongo from "./mongo";
@@ -27,15 +27,8 @@ export const authOptions = {
     // Requires a MongoDB database. Set MONOGODB_URI env variable.
     ...(connectMongo
       ? [
-          EmailProvider({
-            server: {
-              host: "smtp.resend.com",
-              port: 465,
-              auth: {
-                user: "resend",
-                pass: process.env.RESEND_API_KEY,
-              },
-            },
+          ResendProvider({
+            apiKey: process.env.RESEND_API_KEY,
             from: config.resend.fromNoReply,
           }),
         ]

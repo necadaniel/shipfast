@@ -6,17 +6,28 @@ import configFile from "@/config";
 import User from "@/models/User";
 import { findCheckoutSession } from "@/libs/stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-08-16",
-  typescript: true,
-});
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-02-25.clover";
 
 // This is where we receive Stripe webhook events
 // It's used to update user data, send emails, etc...
 // By default, it'll store the user in the database
 // See more: https://shipfa.st/docs/features/payments
 export async function POST(req: NextRequest) {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripeSecretKey || !webhookSecret) {
+    return NextResponse.json(
+      { error: "Stripe webhook is not configured" },
+      { status: 500 }
+    );
+  }
+
+  const stripe = new Stripe(stripeSecretKey, {
+    apiVersion: STRIPE_API_VERSION,
+    typescript: true,
+  });
+
   await connectMongo();
 
   const body = await req.text();
@@ -141,7 +152,10 @@ export async function POST(req: NextRequest) {
         const stripeObject: Stripe.Invoice = event.data
           .object as Stripe.Invoice;
 
-        const priceId = stripeObject.lines.data[0].price.id;
+        const lineItem = stripeObject.lines.data[0] as any;
+        const priceId =
+          lineItem?.price?.id ?? lineItem?.pricing?.price_details?.price;
+        if (!priceId) break;
         const customerId = stripeObject.customer;
 
         const user = await User.findOne({ customerId });

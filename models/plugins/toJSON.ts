@@ -17,7 +17,7 @@ const deleteAtPath = (obj: any, path: string[], index: number) => {
 
 const toJSON = <T extends Document>(schema: Schema<T>) => {
   schema.set('toJSON', {
-    transform: function (doc, ret) {
+    transform: function (_doc, ret: any) {
       Object.keys(schema.paths).forEach((path) => {
         if (schema.paths[path].options && schema.paths[path].options.private) {
           deleteAtPath(ret, path.split('.'), 0);
