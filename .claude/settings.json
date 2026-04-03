@@ -1,0 +1,44 @@
+{
+  "extraKnownMarketplaces": {
+    "ui-ux-pro-max-skill": {
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      }
+    },
+    "wondelai-skills": {
+      "source": {
+        "source": "github",
+        "repo": "wondelai/skills"
+      }
+    },
+    "superpowers-dev": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers"
+      }
+    },
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "product-strategy@wondelai-skills": true,
+    "ux-design@wondelai-skills": true,
+    "marketing-cro@wondelai-skills": true,
+    "sales-influence@wondelai-skills": true,
+    "product-innovation@wondelai-skills": true,
+    "strategy-growth@wondelai-skills": true,
+    "team-motivation@wondelai-skills": true,
+    "code-craftsmanship@wondelai-skills": true,
+    "systems-architecture@wondelai-skills": true,
+    "superpowers@superpowers-dev": true,
+    "document-skills@anthropic-agent-skills": true,
+    "example-skills@anthropic-agent-skills": true,
+    "claude-api@anthropic-agent-skills": true
+  }
+}
