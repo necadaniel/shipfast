@@ -15,38 +15,6 @@ const config = {
     "Securely sync your environment variables across all devices with end-to-end encryption. Never share secrets through Slack or email again.",
   // REQUIRED (no https://, not trailing slash at the end, just the naked domain)
   domainName: "changeme.com",
-  // Plan limits
-  plans: {
-    free: {
-      maxProjects: 5,
-      maxDevices: 1,
-      maxVariablesPerProject: 50,
-      features: ["Basic encryption", "Web access", "Version history (7 days)"],
-    },
-    solo: {
-      maxProjects: 30,
-      maxDevices: 3,
-      maxVariablesPerProject: 200,
-      features: [
-        "End-to-end encryption",
-        "Real-time sync",
-        "CLI & Web access",
-        "Version history (30 days)",
-      ],
-    },
-    team: {
-      maxProjects: -1, // unlimited
-      maxDevices: -1, // unlimited
-      maxVariablesPerProject: -1, // unlimited
-      features: [
-        "Everything in Solo",
-        "Team collaboration",
-        "Role-based permissions",
-        "Unlimited version history",
-        "Priority support",
-      ],
-    },
-  },
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (resend.supportEmail) otherwise customer support won't work.
     id: "",
@@ -60,50 +28,45 @@ const config = {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1SHAkbGfnyRtJEjpzyvT4N9S"
+            ? "price_1Niyy5AxyNprDp7iZIqEyD2h"
             : "price_456",
         //  REQUIRED - Name of the plan, displayed on the pricing page
-        name: "Solo Developer",
+        name: "Starter",
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
-        description: "Perfect for individual developers",
+        description: "Perfect for small projects",
         // The price you want to display, the one user will be charged on Stripe.
-        price: 29,
+        price: 99,
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
-        priceAnchor: 49,
+        priceAnchor: 149,
         features: [
           {
-            name: "Up to 5 projects",
+            name: "NextJS boilerplate",
           },
-          { name: "3 devices" },
-          { name: "End-to-end encryption" },
-          { name: "Real-time sync" },
-          { name: "Version history (30 days)" },
-          { name: "CLI & Web access" },
+          { name: "User oauth" },
+          { name: "Database" },
+          { name: "Emails" },
         ],
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1SHAksGfnyRtJEjpM7fUgXsY"
+            ? "price_1O5KtcAxyNprDp7iftKnrrpw"
             : "price_456",
         // This plan will look different on the pricing page, it will be highlighted. You can only have one plan with isFeatured: true
         isFeatured: true,
-        name: "Team",
-        description: "For growing teams and agencies",
-        price: 79,
-        priceAnchor: 129,
+        name: "Advanced",
+        description: "You need more power",
+        price: 149,
+        priceAnchor: 299,
         features: [
           {
-            name: "Unlimited projects",
+            name: "NextJS boilerplate",
           },
-          { name: "Unlimited devices" },
-          { name: "End-to-end encryption" },
-          { name: "Real-time sync" },
-          { name: "Unlimited version history" },
-          { name: "CLI & Web access" },
-          { name: "Team collaboration" },
-          { name: "Role-based permissions" },
-          { name: "Priority support" },
+          { name: "User oauth" },
+          { name: "Database" },
+          { name: "Emails" },
+          { name: "1 year of updates" },
+          { name: "24/7 support" },
         ],
       },
     ],

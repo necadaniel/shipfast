@@ -17,10 +17,11 @@ const leadSchema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: { virtuals: true },
-  }
+  },
 );
 
 // add plugin that converts mongoose to json
 leadSchema.plugin(toJSON);
 
-export default (mongoose.models.Lead || mongoose.model("Lead", leadSchema)) as mongoose.Model<any>;
+export default (mongoose.models.Lead ||
+  mongoose.model("Lead", leadSchema)) as mongoose.Model<any>;
