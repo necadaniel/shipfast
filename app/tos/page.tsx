@@ -1,30 +1,27 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 import { Button } from "@/components/ui/button";
 
-// CHATGPT PROMPT TO GENERATE YOUR TERMS & SERVICES — replace with your own data 👇
-
-// 1. Go to https://chat.openai.com/
-// 2. Copy paste bellow
-// 3. Replace the data with your own (if needed)
-// 4. Paste the answer from ChatGPT directly in the <pre> tag below
-
-// You are an excellent lawyer.
-
-// I need your help to write a simple Terms & Services for my website. Here is some context:
-// - Website: https://shipfa.st
-// - Name: ShipFast
-// - Contact information: marc@shipfa.st
-// - Description: A JavaScript code boilerplate to help entrepreneurs launch their startups faster
-// - Ownership: when buying a package, users can download code to create apps. They own the code but they do not have the right to resell it. They can ask for a full refund within 7 day after the purchase.
-// - User data collected: name, email and payment information
-// - Non-personal data collection: web cookies
-// - Link to privacy-policy: https://shipfa.st/privacy-policy
-// - Governing Law: France
-// - Updates to the Terms: users will be updated by email
-
-// Please write a simple Terms & Services for my site. Add the current date. Do not add or explain your reasoning. Answer:
+// ⚠️ PLACEHOLDER — replace this before you launch.
+//
+// Generate a first draft by pasting the prompt below into any LLM, then have a
+// lawyer review it. Do not ship someone else's terms with your name on them.
+//
+//   You are an excellent lawyer. Write simple Terms of Service for my website.
+//   - Website: https://<your-domain>
+//   - Name: <your app>
+//   - Contact: <your support email>
+//   - Description: <what your product does>
+//   - Ownership / license terms: <...>
+//   - Refund policy: <...>
+//   - User data collected: name, email, payment information
+//   - Non-personal data: web cookies
+//   - Link to privacy policy: https://<your-domain>/privacy-policy
+//   - Governing law: <your country>
+//   - Updates to the Terms: users will be notified by email
+//   Add today's date. Do not explain your reasoning.
 
 export const metadata = getSEOTags({
   title: `Terms and Conditions | ${config.appName}`,
@@ -33,68 +30,56 @@ export const metadata = getSEOTags({
 
 const TOS = () => {
   return (
-    <main className="max-w-xl mx-auto">
-      <div className="p-5">
-        <Button asChild variant="ghost" size="sm" className="mb-2 gap-2">
-          <Link href="/">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M15 10a.75.75 0 01-.75.75H7.612l2.158 1.96a.75.75 0 11-1.04 1.08l-3.5-3.25a.75.75 0 010-1.08l3.5-3.25a.75.75 0 111.04 1.08L7.612 9.25h6.638A.75.75 0 0115 10z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Back
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-extrabold pb-6">
-          Terms and Conditions for {config.appName}
-        </h1>
+    <main className="mx-auto max-w-xl p-5">
+      <Button asChild variant="ghost" size="sm" className="mb-2 gap-2">
+        <Link href="/">
+          <ArrowLeft className="size-4" />
+          Back
+        </Link>
+      </Button>
 
-        <pre
-          className="leading-relaxed whitespace-pre-wrap"
-          style={{ fontFamily: "sans-serif" }}
-        >
-          {`Last Updated: September 26, 2023
+      <h1 className="pb-6 text-3xl font-extrabold">
+        Terms and Conditions for {config.appName}
+      </h1>
 
-Welcome to ShipFast!
+      <pre className="font-sans leading-relaxed whitespace-pre-wrap">
+        {`Last updated: [DATE]
 
-These Terms of Service ("Terms") govern your use of the ShipFast website at https://shipfa.st ("Website") and the services provided by ShipFast. By using our Website and services, you agree to these Terms.
+These Terms of Service ("Terms") govern your use of ${config.appName} at https://${config.domainName} (the "Website") and the services we provide. By using the Website you agree to these Terms.
 
-1. Description of ShipFast
+1. Description of ${config.appName}
 
-ShipFast is a platform that offers a JavaScript code boilerplate to assist entrepreneurs in launching their startups more efficiently.
+[Describe what your product does.]
 
-2. Ownership and Usage Rights
+2. Ownership and Use Rights
 
-When you purchase a package from ShipFast, you gain the right to download and use the code provided for creating applications. You own the code you create but do not have the right to resell it. We offer a full refund within 7 days of purchase, as specified in our refund policy.
+[Describe what customers may and may not do with what they buy.]
 
-3. User Data and Privacy
+3. Refunds
 
-We collect and store user data, including name, email, and payment information, as necessary to provide our services. For details on how we handle your data, please refer to our Privacy Policy at https://shipfa.st/privacy-policy.
+[Describe your refund policy and the window it applies to.]
 
-4. Non-Personal Data Collection
+4. User Data
 
-We use web cookies to collect non-personal data for the purpose of improving our services and user experience.
+We collect and store the data necessary to provide the service, including name, email and payment information. See our Privacy Policy at https://${config.domainName}/privacy-policy for details.
 
-5. Governing Law
+5. Non-Personal Data
 
-These Terms are governed by the laws of France.
+We use web cookies to operate and improve the Website.
 
-6. Updates to the Terms
+6. Governing Law
 
-We may update these Terms from time to time. Users will be notified of any changes via email.
+These Terms are governed by the laws of [YOUR COUNTRY].
 
-For any questions or concerns regarding these Terms of Service, please contact us at marc@shipfa.st.
+7. Updates to the Terms
 
-Thank you for using ShipFast!`}
-        </pre>
-      </div>
+We may update these Terms. Users will be notified of material changes by email.
+
+8. Contact
+
+Questions about these Terms: ${config.resend.supportEmail ?? "[YOUR SUPPORT EMAIL]"}
+`}
+      </pre>
     </main>
   );
 };

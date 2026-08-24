@@ -1,31 +1,43 @@
-/* eslint-disable no-param-reassign */
+import type { Schema } from "mongoose";
 
 /**
- * A mongoose schema plugin which applies the following in the toJSON transform call:
- *  - removes __v, createdAt, updatedAt, and any path that has private: true
+ * Mongoose schema plugin applied in the toJSON transform:
+ *  - removes __v
  *  - replaces _id with id
+ *  - removes any path declared with `private: true`
+ *
+ * This keeps internal fields out of API responses by default, so you have to
+ * opt in to exposing something rather than remember to hide it.
  */
-import { Schema, Document } from 'mongoose';
 
-const deleteAtPath = (obj: any, path: string[], index: number) => {
+type PlainObject = Record<string, unknown>;
+
+const deleteAtPath = (obj: PlainObject, path: string[], index: number) => {
+  const key = path[index];
+
   if (index === path.length - 1) {
-    delete obj[path[index]];
+    delete obj[key];
     return;
   }
-  deleteAtPath(obj[path[index]], path, index + 1);
+
+  const next = obj[key];
+  if (next && typeof next === "object") {
+    deleteAtPath(next as PlainObject, path, index + 1);
+  }
 };
 
-const toJSON = <T extends Document>(schema: Schema<T>) => {
-  schema.set('toJSON', {
-    transform: function (_doc, ret: any) {
+const toJSON = (schema: Schema) => {
+  schema.set("toJSON", {
+    transform(_doc, ret: PlainObject) {
       Object.keys(schema.paths).forEach((path) => {
-        if (schema.paths[path].options && schema.paths[path].options.private) {
-          deleteAtPath(ret, path.split('.'), 0);
+        const options = schema.paths[path]?.options;
+        if (options?.private) {
+          deleteAtPath(ret, path.split("."), 0);
         }
       });
 
       if (ret._id) {
-        ret.id = ret._id.toString();
+        ret.id = String(ret._id);
       }
       delete ret._id;
       delete ret.__v;
@@ -34,32 +46,3 @@ const toJSON = <T extends Document>(schema: Schema<T>) => {
 };
 
 export default toJSON;
-
-// Previous implementation (not working)
-// const toJSON = <T extends SchemaDocument>(schema: Schema<T>) => {
-//   let transform: Function | undefined;
-
-//   if (schema.options.toJSON && schema.options.toJSON.transform) {
-//     transform = schema.options.toJSON.transform;
-//   }
-
-//   schema.options.toJSON = Object.assign(schema.options.toJSON || {}, {
-//     transform(doc: T, ret: any, options: any) {
-//       Object.keys(schema.paths).forEach((path) => {
-//         if (schema.paths[path].options && schema.paths[path].options.private) {
-//           deleteAtPath(ret, path.split('.'), 0);
-//         }
-//       });
-
-//       if (ret._id) {
-//         ret.id = ret._id.toString();
-//       }
-//       delete ret._id;
-//       delete ret.__v;
-
-//       if (transform) {
-//         return transform(doc, ret, options);
-//       }
-//     },
-//   });
-// };

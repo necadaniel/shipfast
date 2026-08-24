@@ -1,67 +1,51 @@
 import { ConfigProps } from "./types/config";
 
-// Theme colors from globals.css
-const themes = {
-  light: {
-    primary: "oklch(0.205 0 0)", // --primary from globals.css
-  },
-};
-
 const config = {
   // REQUIRED
   appName: "ChangeMe",
-  // REQUIRED: a short description of your app for SEO tags (can be overwritten)
+  // REQUIRED: a short description of your app for SEO tags (can be overwritten per page)
   appDescription:
-    "Securely sync your environment variables across all devices with end-to-end encryption. Never share secrets through Slack or email again.",
-  // REQUIRED (no https://, not trailing slash at the end, just the naked domain)
+    "The Next.js starter with auth, payments and a production-grade UI. Ship your startup in days, not weeks.",
+  // REQUIRED: no https://, no trailing slash — just the naked domain
   domainName: "changeme.com",
+
   crisp: {
-    // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (resend.supportEmail) otherwise customer support won't work.
+    // Crisp website ID. If you don't use Crisp, leave this empty and set resend.supportEmail below,
+    // otherwise customer support won't work.
     id: "",
-    // Hide Crisp by default, except on route "/". Crisp is toggled with <ButtonSupport/>. If you want to show Crisp on every routes, just remove this below
+    // Crisp is hidden by default except on the routes listed here. Toggle it with <ButtonSupport />.
+    // Remove this key to show Crisp everywhere.
     onlyShowOnRoutes: ["/"],
   },
+
   stripe: {
-    // Create multiple plans in your Stripe dashboard, then add them here. You can add as many plans as you want, just make sure to add the priceId
+    // Create your products/prices in the Stripe dashboard, then paste the price IDs here.
+    // `mode` must match the Stripe price type: "payment" for one-time, "subscription" for recurring.
     plans: [
       {
-        // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1Niyy5AxyNprDp7iZIqEyD2h"
-            : "price_456",
-        //  REQUIRED - Name of the plan, displayed on the pricing page
+        priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER ?? "",
         name: "Starter",
-        // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
         description: "Perfect for small projects",
-        // The price you want to display, the one user will be charged on Stripe.
         price: 99,
-        // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
         priceAnchor: 149,
+        mode: "payment",
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
+          { name: "NextJS boilerplate" },
           { name: "User oauth" },
           { name: "Database" },
           { name: "Emails" },
         ],
       },
       {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1O5KtcAxyNprDp7iftKnrrpw"
-            : "price_456",
-        // This plan will look different on the pricing page, it will be highlighted. You can only have one plan with isFeatured: true
-        isFeatured: true,
+        priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ADVANCED ?? "",
         name: "Advanced",
         description: "You need more power",
         price: 149,
         priceAnchor: 299,
+        mode: "payment",
+        isFeatured: true,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
+          { name: "NextJS boilerplate" },
           { name: "User oauth" },
           { name: "Database" },
           { name: "Emails" },
@@ -71,31 +55,29 @@ const config = {
       },
     ],
   },
-  aws: {
-    // If you use AWS S3/Cloudfront, put values in here
-    bucket: "bucket-name",
-    bucketUrl: `https://bucket-name.s3.amazonaws.com/`,
-    cdn: "https://cdn-id.cloudfront.net/",
-  },
+
   resend: {
-    // REQUIRED — Email 'From' field to be used when sending magic login links
-    fromNoReply: `ChangeMe <noreply@resend.ChangeMe.app>`,
-    // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
-    fromAdmin: `Daniel at ChangeMe <daniel@resend.ChangeMe.app>`,
-    // Email shown to customer if they need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
-    supportEmail: "neca.danii@gmail.com",
+    // REQUIRED — 'From' field for magic login links. The domain must be verified in Resend.
+    fromNoReply: `ChangeMe <noreply@resend.changeme.com>`,
+    // REQUIRED — 'From' field for every other email (receipts, updates, etc.)
+    fromAdmin: `Daniel at ChangeMe <daniel@resend.changeme.com>`,
+    // Shown to customers who need help. Leave empty only if you set up Crisp above.
+    supportEmail: "you@example.com",
   },
+
   colors: {
-    // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..)
-    // Using the primary color from globals.css converted to HEX for browser compatibility
-    main: "#2b7fff", // Converted from oklch(0.205 0 0) to HEX
+    // REQUIRED — used outside the document (loading bar, Chrome tab color, etc.)
+    // Must be a HEX value. Keep it in sync with --primary in app/globals.css.
+    main: "#2b7fff",
   },
+
   auth: {
-    // REQUIRED — the path to log in users. It's use to protect private routes (like /dashboard). It's used in apiClient (/libs/api.js) upon 401 errors from our API
+    // REQUIRED — where to send users to log in. Used to protect private routes
+    // and by libs/api.ts on 401 responses.
     loginUrl: "/api/auth/signin",
-    // REQUIRED — the path you want to redirect users to after a successful login (i.e. /dashboard, /private). This is normally a private page for users to manage their accounts. It's used in apiClient (/libs/api.js) upon 401 errors from our API & in ButtonSignin.js
+    // REQUIRED — where to send users after a successful login.
     callbackUrl: "/dashboard",
   },
-} as ConfigProps;
+} satisfies ConfigProps;
 
 export default config;

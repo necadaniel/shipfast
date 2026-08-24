@@ -1,114 +1,104 @@
 "use client";
 
-import { useRef, useState } from "react";
-import type { JSX } from "react";
+import type { ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import config from "@/config";
 
-// <FAQ> component is a lsit of <Item> component
-// Just import the FAQ & add your FAQ content to the const faqList arrayy below.
+// Add your own questions to faqList below. Answers accept any JSX.
 
-interface FAQItemProps {
+interface FAQItem {
   question: string;
-  answer: JSX.Element;
+  answer: ReactNode;
 }
 
-const faqList: FAQItemProps[] = [
+const faqList: FAQItem[] = [
   {
-    question: "What do I get exactly?",
-    answer: <div className="space-y-2 leading-relaxed">Loreum Ipseum</div>,
+    question: `What do I get exactly?`,
+    answer: (
+      <p>
+        A production-ready Next.js app with authentication, Stripe billing,
+        transactional emails, a protected dashboard and a component library — so
+        you can start on your actual product instead of the plumbing.
+      </p>
+    ),
   },
   {
     question: "Can I get a refund?",
     answer: (
       <p>
-        Yes! You can request a refund within 7 days of your purchase. Reach out
-        by email.
+        Yes. Request a refund within 7 days of your purchase by emailing{" "}
+        {config.resend.supportEmail ?? "our support team"}.
+      </p>
+    ),
+  },
+  {
+    question: "Do I need a database?",
+    answer: (
+      <p>
+        MongoDB is used for user accounts and magic-link tokens. Add your
+        connection string as <code>MONGODB_URI</code> and everything else works
+        out of the box.
       </p>
     ),
   },
   {
     question: "I have another question",
     answer: (
-      <div className="space-y-2 leading-relaxed">Cool, contact us by email</div>
+      <p>
+        Reach out at{" "}
+        {config.resend.supportEmail ? (
+          <a
+            href={`mailto:${config.resend.supportEmail}`}
+            className="text-primary hover:underline"
+          >
+            {config.resend.supportEmail}
+          </a>
+        ) : (
+          "our support address"
+        )}
+        .
+      </p>
     ),
   },
 ];
 
-const FaqItem = ({ item }: { item: FAQItemProps }) => {
-  const accordion = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <li>
-      <button
-        className="relative flex gap-2 items-center w-full py-5 text-base font-semibold text-left border-t md:text-lg border-border"
-        onClick={(e) => {
-          e.preventDefault();
-          setIsOpen(!isOpen);
-        }}
-        aria-expanded={isOpen}
-      >
-        <span
-          className={`flex-1 text-foreground ${isOpen ? "text-primary" : ""}`}
-        >
-          {item?.question}
-        </span>
-        <svg
-          className={`flex-shrink-0 w-4 h-4 ml-auto fill-current`}
-          viewBox="0 0 16 16"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect
-            y="7"
-            width="16"
-            height="2"
-            rx="1"
-            className={`transform origin-center transition duration-200 ease-out ${
-              isOpen && "rotate-180"
-            }`}
-          />
-          <rect
-            y="7"
-            width="16"
-            height="2"
-            rx="1"
-            className={`transform origin-center rotate-90 transition duration-200 ease-out ${
-              isOpen && "rotate-180 hidden"
-            }`}
-          />
-        </svg>
-      </button>
-
-      <div
-        ref={accordion}
-        className={`transition-all duration-300 ease-in-out opacity-80 overflow-hidden`}
-        style={
-          isOpen
-            ? { maxHeight: accordion?.current?.scrollHeight, opacity: 1 }
-            : { maxHeight: 0, opacity: 0 }
-        }
-      >
-        <div className="pb-5 leading-relaxed">{item?.answer}</div>
+const FaqItem = ({ item }: { item: FAQItem }) => (
+  <Collapsible className="group border-border border-t">
+    <CollapsibleTrigger className="hover:text-primary flex w-full items-center gap-2 py-5 text-left text-base font-semibold transition-colors md:text-lg">
+      <span className="flex-1">{item.question}</span>
+      <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+    </CollapsibleTrigger>
+    <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden">
+      <div className="text-muted-foreground pb-5 leading-relaxed">
+        {item.answer}
       </div>
-    </li>
-  );
-};
+    </CollapsibleContent>
+  </Collapsible>
+);
 
 const FAQ = () => {
   return (
     <section className="bg-muted/30" id="faq">
-      <div className="py-24 px-8 max-w-7xl mx-auto flex flex-col md:flex-row gap-12">
-        <div className="flex flex-col text-left basis-1/2">
-          <p className="inline-block font-semibold text-primary mb-4">FAQ</p>
-          <p className="sm:text-4xl text-3xl font-extrabold text-foreground">
-            Frequently Asked Questions
+      <div className="mx-auto flex max-w-7xl flex-col gap-12 px-6 py-20 lg:flex-row lg:px-8 lg:py-28">
+        <div className="flex flex-col lg:basis-1/2">
+          <p className="text-primary mb-4 text-sm font-semibold tracking-wider uppercase">
+            FAQ
           </p>
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Frequently asked questions
+          </h2>
         </div>
 
-        <ul className="basis-1/2">
-          {faqList.map((item, i) => (
-            <FaqItem key={i} item={item} />
+        <div className="lg:basis-1/2">
+          {faqList.map((item) => (
+            <FaqItem key={item.question} item={item} />
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );

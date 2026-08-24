@@ -29,7 +29,7 @@ const TestimonialsAvatars = ({ priority }: { priority?: boolean }) => {
       <div className="flex -space-x-3">
         {avatars.map((image, i) => (
           <div
-            className="overflow-hidden rounded-full border-2 border-background bg-muted"
+            className="border-background bg-muted overflow-hidden rounded-full border-2"
             key={i}
           >
             <Image
@@ -62,8 +62,8 @@ const TestimonialsAvatars = ({ priority }: { priority?: boolean }) => {
             </svg>
           ))}
         </div>
-        <p className="text-sm text-muted-foreground">
-          <span className="font-semibold text-foreground">32+</span> makers ship
+        <p className="text-muted-foreground text-sm">
+          <span className="text-foreground font-semibold">32+</span> makers ship
           faster
         </p>
       </div>

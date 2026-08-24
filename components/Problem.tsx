@@ -1,7 +1,7 @@
 const Arrow = ({ extraStyle }: { extraStyle: string }) => {
   return (
     <svg
-      className={`h-12 w-12 shrink-0 fill-background/70 ${extraStyle}`}
+      className={`fill-background/70 h-12 w-12 shrink-0 ${extraStyle}`}
       viewBox="0 0 138 138"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +38,7 @@ const Problem = () => {
         <h2 className="mx-auto mb-6 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">
           80% of startups fail because founders never launch
         </h2>
-        <p className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-background/80">
+        <p className="text-background/80 mx-auto mb-12 max-w-2xl text-lg leading-relaxed">
           Payment setup, auth flows, and production polish can block momentum.
           The longer setup takes, the lower the chance you ship.
         </p>

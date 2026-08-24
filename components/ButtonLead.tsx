@@ -27,11 +27,11 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
       toast.success("Thanks for joining the waitlist!");
 
       // just remove the focus on the input
-      inputRef.current.blur();
+      inputRef.current?.blur();
       setEmail("");
       setIsDisabled(true);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // apiClient already showed a toast
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +55,7 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
       <Button
         className="w-full gap-2"
         type="submit"
-        disabled={isDisabled}
+        disabled={isDisabled || isLoading}
       >
         Join waitlist
         {isLoading ? (

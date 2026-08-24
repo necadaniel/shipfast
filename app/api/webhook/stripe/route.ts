@@ -2,197 +2,150 @@ import { NextResponse, NextRequest } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import connectMongo from "@/libs/mongoose";
-import configFile from "@/config";
 import User from "@/models/User";
-import { findCheckoutSession } from "@/libs/stripe";
+import { getStripe, findCheckoutSession } from "@/libs/stripe";
+import { getPlanByPriceId } from "@/libs/plans";
 
-const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-02-25.clover";
+// Stripe sends either a bare ID or an expanded object depending on the event
+// and your API settings. Always normalise before querying the database.
+const toId = (
+  value: string | { id: string } | null | undefined
+): string | undefined => (typeof value === "string" ? value : value?.id);
 
-// This is where we receive Stripe webhook events
-// It's used to update user data, send emails, etc...
-// By default, it'll store the user in the database
-// See more: https://shipfa.st/docs/features/payments
+// Stripe webhook receiver. This is what actually grants and revokes access.
+//
+// Local testing:
+//   stripe listen --forward-to localhost:3000/api/webhook/stripe
+// Production: add https://<your-domain>/api/webhook/stripe in the Stripe dashboard.
 export async function POST(req: NextRequest) {
-  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  if (!stripeSecretKey || !webhookSecret) {
+  if (!webhookSecret) {
+    console.error("STRIPE_WEBHOOK_SECRET is missing — see .env.example");
     return NextResponse.json(
       { error: "Stripe webhook is not configured" },
       { status: 500 }
     );
   }
 
-  const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: STRIPE_API_VERSION,
-    typescript: true,
-  });
+  const stripe = getStripe();
+  const body = await req.text();
+  const signature = (await headers()).get("stripe-signature");
+
+  let event: Stripe.Event;
+
+  // Verify the event really came from Stripe
+  try {
+    event = stripe.webhooks.constructEvent(body, signature!, webhookSecret);
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err);
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
 
   await connectMongo();
 
-  const body = await req.text();
-
-  const signature = (await headers()).get("stripe-signature");
-
-  let eventType;
-  let event;
-
-  // verify Stripe event is legit
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err) {
-    console.error(`Webhook signature verification failed. ${err.message}`);
-    return NextResponse.json({ error: err.message }, { status: 400 });
-  }
-
-  eventType = event.type;
-
-  try {
-    switch (eventType) {
+    switch (event.type) {
+      // Payment succeeded (or a subscription started) — grant access
       case "checkout.session.completed": {
-        // First payment is successful and a subscription is created (if mode was set to "subscription" in ButtonCheckout)
-        // ✅ Grant access to the product
-        const stripeObject: Stripe.Checkout.Session = event.data
-          .object as Stripe.Checkout.Session;
-
+        const stripeObject = event.data.object as Stripe.Checkout.Session;
         const session = await findCheckoutSession(stripeObject.id);
 
-        const customerId = session?.customer;
-        const priceId = session?.line_items?.data[0]?.price.id;
+        const customerId = toId(session?.customer);
+        const priceId = session?.line_items?.data[0]?.price?.id;
         const userId = stripeObject.client_reference_id;
-        const plan = configFile.stripe.plans.find((p) => p.priceId === priceId);
 
-        if (!plan) break;
-
-        const customer = (await stripe.customers.retrieve(
-          customerId as string
-        )) as Stripe.Customer;
-
-        let user;
-
-        // Get or create the user. userId is normally passed in the checkout session (clientReferenceID) to identify the user when we get the webhook event
-        if (userId) {
-          user = await User.findById(userId);
-        } else if (customer.email) {
-          user = await User.findOne({ email: customer.email });
-
-          if (!user) {
-            user = await User.create({
-              email: customer.email,
-              name: customer.name,
-            });
-
-            await user.save();
-          }
-        } else {
-          console.error("No user found");
-          throw new Error("No user found");
+        if (!priceId || !getPlanByPriceId(priceId)) {
+          console.warn(`Ignoring checkout for unknown price: ${priceId}`);
+          break;
         }
 
-        // Update user data + Grant user access to your product. It's a boolean in the database, but could be a number of credits, etc...
+        let user = userId ? await User.findById(userId) : null;
+
+        // Fall back to matching by email (e.g. a payment link used outside the app)
+        if (!user && customerId) {
+          const customer = (await stripe.customers.retrieve(
+            customerId
+          )) as Stripe.Customer;
+
+          if (customer.email) {
+            user =
+              (await User.findOne({ email: customer.email })) ??
+              (await User.create({
+                email: customer.email,
+                name: customer.name ?? undefined,
+              }));
+          }
+        }
+
+        if (!user) {
+          console.error("checkout.session.completed: no user found");
+          break;
+        }
+
         user.priceId = priceId;
         user.customerId = customerId;
         user.hasAccess = true;
-        
-        // Set the plan based on the Stripe price ID
-        if (priceId === configFile.stripe.plans[0].priceId) {
-          user.plan = "solo";
-        } else if (priceId === configFile.stripe.plans[1].priceId) {
-          user.plan = "team";
-        }
-        
         await user.save();
 
-        // Extra: send email with user link, product page, etc...
-        // try {
-        //   await sendEmail(...);
-        // } catch (e) {
-        //   console.error("Email issue:" + e?.message);
-        // }
-
+        // Optional: send a welcome email here with libs/resend.ts
         break;
       }
 
-      case "checkout.session.expired": {
-        // User didn't complete the transaction
-        // You don't need to do anything here, but you can send an email to the user to remind them to complete the transaction, for instance
-        break;
-      }
-
-      case "customer.subscription.updated": {
-        // The customer might have changed the plan (higher or lower plan, cancel soon etc...)
-        // You don't need to do anything here, because Stripe will let us know when the subscription is canceled for good (at the end of the billing cycle) in the "customer.subscription.deleted" event
-        // You can update the user data to show a "Subscription ending soon" badge for instance
-        break;
-      }
-
-      case "customer.subscription.deleted": {
-        // The customer subscription stopped
-        // ❌ Revoke access to the product
-        const stripeObject: Stripe.Subscription = event.data
-          .object as Stripe.Subscription;
-
-        const subscription = await stripe.subscriptions.retrieve(
-          stripeObject.id
-        );
-        const user = await User.findOne({ customerId: subscription.customer });
-
-        // Revoke access to your product and reset to free plan
-        user.hasAccess = false;
-        user.plan = "free";
-        await user.save();
-
-        break;
-      }
-
+      // Recurring payment succeeded — keep access on
       case "invoice.paid": {
-        // Customer just paid an invoice (for instance, a recurring payment for a subscription)
-        // ✅ Grant access to the product
+        const stripeObject = event.data.object as Stripe.Invoice;
+        const lineItem = stripeObject.lines.data[0] as
+          | (Stripe.InvoiceLineItem & {
+              price?: { id?: string };
+              pricing?: { price_details?: { price?: string } };
+            })
+          | undefined;
 
-        const stripeObject: Stripe.Invoice = event.data
-          .object as Stripe.Invoice;
-
-        const lineItem = stripeObject.lines.data[0] as any;
         const priceId =
           lineItem?.price?.id ?? lineItem?.pricing?.price_details?.price;
         if (!priceId) break;
-        const customerId = stripeObject.customer;
+
+        const customerId = toId(stripeObject.customer);
+        if (!customerId) break;
 
         const user = await User.findOne({ customerId });
+        if (!user) break;
 
-        // Make sure the invoice is for the same plan (priceId) the user subscribed to
+        // Only extend access for the plan the user actually subscribed to
         if (user.priceId !== priceId) break;
 
-        // Grant user access to your product. It's a boolean in the database, but could be a number of credits, etc...
         user.hasAccess = true;
-        
-        // Set the plan based on the Stripe price ID
-        if (priceId === configFile.stripe.plans[0].priceId) {
-          user.plan = "solo";
-        } else if (priceId === configFile.stripe.plans[1].priceId) {
-          user.plan = "team";
-        }
-        
         await user.save();
-
         break;
       }
 
-      case "invoice.payment_failed":
-        // A payment failed (for instance the customer does not have a valid payment method)
-        // ❌ Revoke access to the product
-        // ⏳ OR wait for the customer to pay (more friendly):
-        //      - Stripe will automatically email the customer (Smart Retries)
-        //      - We will receive a "customer.subscription.deleted" when all retries were made and the subscription has expired
+      // Subscription ended for good — revoke access
+      case "customer.subscription.deleted": {
+        const stripeObject = event.data.object as Stripe.Subscription;
+        const customerId = toId(stripeObject.customer);
+        if (!customerId) break;
 
+        const user = await User.findOne({ customerId });
+        if (!user) break;
+
+        user.hasAccess = false;
+        await user.save();
         break;
+      }
 
+      // Nothing to do, but handy hooks if you want them:
+      // - checkout.session.expired    → remind the user to finish checking out
+      // - customer.subscription.updated → plan changed / cancels at period end
+      // - invoice.payment_failed      → Stripe retries automatically, then sends
+      //                                 customer.subscription.deleted
       default:
-      // Unhandled event type
+        break;
     }
   } catch (e) {
-    console.error("stripe error: ", e.message);
+    // Return 200 so Stripe doesn't retry a bug forever; the error is logged.
+    console.error(`Stripe webhook error on ${event.type}:`, e);
   }
 
-  return NextResponse.json({});
+  return NextResponse.json({ received: true });
 }

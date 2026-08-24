@@ -1,6 +1,33 @@
 import Stripe from "stripe";
 
-const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-02-25.clover";
+// Pinned so Stripe's behaviour can't shift under you (important for webhooks).
+// Typed as LatestApiVersion on purpose: bumping the SDK to a major that moved on
+// will fail `npm run typecheck` here, prompting a deliberate review of the
+// changelog rather than a silent behaviour change.
+const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-07-29.dahlia";
+
+let cachedStripe: Stripe | null = null;
+
+/**
+ * Lazily creates the Stripe client so importing this file never throws at build
+ * time when STRIPE_SECRET_KEY isn't set yet.
+ */
+export const getStripe = (): Stripe => {
+  if (cachedStripe) return cachedStripe;
+
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error(
+      "STRIPE_SECRET_KEY is missing. Add it to .env.local — see .env.example."
+    );
+  }
+
+  cachedStripe = new Stripe(secretKey, {
+    apiVersion: STRIPE_API_VERSION,
+    typescript: true,
+  });
+  return cachedStripe;
+};
 
 interface CreateCheckoutParams {
   priceId: string;
@@ -20,7 +47,8 @@ interface CreateCustomerPortalParams {
   returnUrl: string;
 }
 
-// This is used to create a Stripe Checkout for one-time payments. It's usually triggered with the <ButtonCheckout /> component. Webhooks are used to update the user's state in the database.
+// Creates a Stripe Checkout session (one-time payment or subscription).
+// Usually triggered by <ButtonCheckout />. The webhook updates the user afterwards.
 export const createCheckout = async ({
   user,
   mode,
@@ -30,76 +58,57 @@ export const createCheckout = async ({
   priceId,
   couponId,
 }: CreateCheckoutParams): Promise<string> => {
-  try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: STRIPE_API_VERSION,
-      typescript: true,
-    });
+  const stripe = getStripe();
 
-    const extraParams: {
-      customer?: string;
-      customer_creation?: "always";
-      customer_email?: string;
-      invoice_creation?: { enabled: boolean };
-      payment_intent_data?: { setup_future_usage: "on_session" };
-      tax_id_collection?: { enabled: boolean };
-    } = {};
+  const extraParams: {
+    customer?: string;
+    customer_creation?: "always";
+    customer_email?: string;
+    invoice_creation?: { enabled: boolean };
+    payment_intent_data?: { setup_future_usage: "on_session" };
+    tax_id_collection?: { enabled: boolean };
+  } = {};
 
-    if (user?.customerId) {
-      extraParams.customer = user.customerId;
-    } else {
-      if (mode === "payment") {
-        extraParams.customer_creation = "always";
-        // The option below costs 0.4% (up to $2) per invoice. Alternatively, you can use https://zenvoice.io/ to create unlimited invoices automatically.
-        // extraParams.invoice_creation = { enabled: true };
-        extraParams.payment_intent_data = { setup_future_usage: "on_session" };
-      }
-      if (user?.email) {
-        extraParams.customer_email = user.email;
-      }
-      extraParams.tax_id_collection = { enabled: true };
+  if (user?.customerId) {
+    extraParams.customer = user.customerId;
+  } else {
+    if (mode === "payment") {
+      extraParams.customer_creation = "always";
+      // Enabling invoices costs 0.4% (up to $2) per invoice.
+      // extraParams.invoice_creation = { enabled: true };
+      extraParams.payment_intent_data = { setup_future_usage: "on_session" };
     }
-
-    const stripeSession = await stripe.checkout.sessions.create({
-      mode,
-      allow_promotion_codes: true,
-      client_reference_id: clientReferenceId,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      discounts: couponId
-        ? [
-            {
-              coupon: couponId,
-            },
-          ]
-        : [],
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      ...extraParams,
-    });
-
-    return stripeSession.url;
-  } catch (e) {
-    console.error(e);
-    return null;
+    if (user?.email) {
+      extraParams.customer_email = user.email;
+    }
+    extraParams.tax_id_collection = { enabled: true };
   }
+
+  const stripeSession = await stripe.checkout.sessions.create({
+    mode,
+    allow_promotion_codes: true,
+    client_reference_id: clientReferenceId,
+    line_items: [{ price: priceId, quantity: 1 }],
+    discounts: couponId ? [{ coupon: couponId }] : [],
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    ...extraParams,
+  });
+
+  if (!stripeSession.url) {
+    throw new Error("Stripe did not return a Checkout URL");
+  }
+
+  return stripeSession.url;
 };
 
-// This is used to create Customer Portal sessions, so users can manage their subscriptions (payment methods, cancel, etc..)
+// Creates a Customer Portal session so users can manage their subscription,
+// payment methods, invoices and cancellations.
 export const createCustomerPortal = async ({
   customerId,
   returnUrl,
 }: CreateCustomerPortalParams): Promise<string> => {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: STRIPE_API_VERSION,
-    typescript: true,
-  });
-
-  const portalSession = await stripe.billingPortal.sessions.create({
+  const portalSession = await getStripe().billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
   });
@@ -107,21 +116,10 @@ export const createCustomerPortal = async ({
   return portalSession.url;
 };
 
-// This is used to get the uesr checkout session and populate the data so we get the planId the user subscribed to
+// Retrieves a checkout session with its line items expanded, so the webhook can
+// read which price the customer actually paid for.
 export const findCheckoutSession = async (sessionId: string) => {
-  try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: STRIPE_API_VERSION,
-      typescript: true,
-    });
-
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["line_items"],
-    });
-
-    return session;
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
+  return getStripe().checkout.sessions.retrieve(sessionId, {
+    expand: ["line_items"],
+  });
 };

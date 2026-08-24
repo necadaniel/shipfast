@@ -6,49 +6,54 @@ import config from "@/config";
 import { Button } from "@/components/ui/button";
 import { Loader2, Rocket } from "lucide-react";
 
-// This component is used to create Stripe Checkout Sessions
-// It calls the /api/stripe/create-checkout route with the priceId, successUrl and cancelUrl
-// By default, it doesn't force users to be authenticated. But if they are, it will prefill the Checkout data with their email and/or credit card. You can change that in the API route
-// You can also change the mode to "subscription" if you want to create a subscription instead of a one-time payment
+// Starts a Stripe Checkout session for a given price.
+// The payment mode (one-time vs subscription) is read from config.stripe.plans
+// server-side, so it can't be tampered with from the browser.
 const ButtonCheckout = ({
   priceId,
-  mode = "payment",
+  label,
 }: {
   priceId: string;
-  mode?: "payment" | "subscription";
+  label?: string;
 }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
     setIsLoading(true);
 
     try {
-      const { url }: { url: string } = await apiClient.post(
+      const { url } = await apiClient.post<{ url: string }>(
         "/stripe/create-checkout",
         {
           priceId,
           successUrl: window.location.href,
           cancelUrl: window.location.href,
-          mode,
         }
       );
 
       window.location.href = url;
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // apiClient already showed a toast
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
+  // No price configured yet — don't send an empty priceId to Stripe
+  const isConfigured = Boolean(priceId);
+
   return (
-    <Button className="w-full gap-2" onClick={() => handlePayment()}>
+    <Button
+      className="w-full gap-2"
+      onClick={handlePayment}
+      disabled={isLoading || !isConfigured}
+      title={isConfigured ? undefined : "Add this plan's Stripe price ID first"}
+    >
       {isLoading ? (
         <Loader2 className="size-4 animate-spin" />
       ) : (
         <Rocket className="size-4" />
       )}
-      Get {config?.appName}
+      {label ?? `Get ${config.appName}`}
     </Button>
   );
 };

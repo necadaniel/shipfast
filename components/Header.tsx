@@ -25,7 +25,7 @@ const Header = () => {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
+    <header className="border-border/60 bg-background/90 sticky top-0 z-40 border-b backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         <Link
           className="flex items-center gap-2"
@@ -50,7 +50,7 @@ const Header = () => {
             <Link
               href={link.href}
               key={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
               title={link.label}
             >
               {link.label}
@@ -64,7 +64,7 @@ const Header = () => {
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-lg border border-border p-2 lg:hidden"
+          className="border-border inline-flex items-center justify-center rounded-lg border p-2 lg:hidden"
           onClick={() => setIsOpen(true)}
         >
           <span className="sr-only">Open menu</span>
@@ -74,7 +74,7 @@ const Header = () => {
 
       <div
         className={cn(
-          "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm transition-opacity lg:hidden",
+          "bg-background/80 fixed inset-0 z-50 backdrop-blur-sm transition-opacity lg:hidden",
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={() => setIsOpen(false)}
@@ -82,7 +82,7 @@ const Header = () => {
 
       <aside
         className={cn(
-          "fixed inset-y-0 right-0 z-50 w-full max-w-xs border-l border-border bg-background p-6 shadow-xl transition-transform lg:hidden",
+          "border-border bg-background fixed inset-y-0 right-0 z-50 w-full max-w-xs border-l p-6 shadow-xl transition-transform lg:hidden",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -106,7 +106,7 @@ const Header = () => {
           </Link>
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-lg border border-border p-2"
+            className="border-border inline-flex items-center justify-center rounded-lg border p-2"
             onClick={() => setIsOpen(false)}
           >
             <span className="sr-only">Close menu</span>
@@ -119,7 +119,7 @@ const Header = () => {
             <Link
               href={link.href}
               key={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
               title={link.label}
             >
               {link.label}

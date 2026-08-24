@@ -1,11 +1,13 @@
 import { MongoClient } from "mongodb";
 
-// This lib is use just to connect to the database in next-auth.
-// We don't use it anywhere else in the API routes—we use mongoose.js instead (to be able to use models)
-// See /libs/nextauth.js file.
+// Raw MongoDB client, used ONLY by the NextAuth adapter (libs/next-auth.ts),
+// which needs the native driver. Everywhere else use mongoose via libs/mongoose.ts
+// so you get schemas and models.
+//
+// Exports undefined when MONGODB_URI isn't set, which disables the database-backed
+// parts of auth instead of crashing the app.
 
 declare global {
-  // eslint-disable-next-line no-unused-vars
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
@@ -16,14 +18,10 @@ let client: MongoClient | undefined;
 let clientPromise: Promise<MongoClient> | undefined;
 
 if (!uri) {
-  console.group("⚠️ MONGODB_URI missing from .env");
-  console.error(
-    "It's not mandatory but a database is required for Magic Links."
+  console.warn(
+    "⚠️  MONGODB_URI is not set — user accounts and magic links are disabled.\n" +
+      "   Add it to .env.local (see .env.example) when you're ready."
   );
-  console.error(
-    "If you don't need it, remove the code from /libs/next-auth.js (see connectMongo())"
-  );
-  console.groupEnd();
 } else if (process.env.NODE_ENV === "development") {
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);

@@ -1,51 +1,56 @@
 import { NextResponse, NextRequest } from "next/server";
+import { z } from "zod";
 import { auth } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import { createCustomerPortal } from "@/libs/stripe";
 import User from "@/models/User";
 
+const bodySchema = z.object({
+  returnUrl: z.url("A valid return URL is required"),
+});
+
+// Opens the Stripe Customer Portal so users can manage their subscription,
+// payment methods and invoices. Called by <ButtonAccount />.
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  try {
+    const session = await auth();
 
-  if (session) {
-    try {
-      await connectMongo();
-
-      const body = await req.json();
-
-      const { id } = session.user;
-
-      const user = id ? await User.findById(String(id)) : null;
-
-      if (!user?.customerId) {
-        return NextResponse.json(
-          {
-            error:
-              "You don't have a billing account yet. Make a purchase first.",
-          },
-          { status: 400 }
-        );
-      } else if (!body.returnUrl) {
-        return NextResponse.json(
-          { error: "Return URL is required" },
-          { status: 400 }
-        );
-      }
-
-      const stripePortalUrl = await createCustomerPortal({
-        customerId: user.customerId,
-        returnUrl: body.returnUrl,
-      });
-
-      return NextResponse.json({
-        url: stripePortalUrl,
-      });
-    } catch (e) {
-      console.error(e);
-      return NextResponse.json({ error: e?.message }, { status: 500 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Not signed in" }, { status: 401 });
     }
-  } else {
-    // Not Signed in
-    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+
+    const parsed = bodySchema.safeParse(await req.json());
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: z.prettifyError(parsed.error) },
+        { status: 400 }
+      );
+    }
+
+    await connectMongo();
+    const user = await User.findById(String(session.user.id));
+
+    if (!user?.customerId) {
+      return NextResponse.json(
+        {
+          error: "You don't have a billing account yet. Make a purchase first.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const url = await createCustomerPortal({
+      customerId: user.customerId,
+      returnUrl: parsed.data.returnUrl,
+    });
+
+    return NextResponse.json({ url });
+  } catch (e) {
+    console.error("create-portal:", e);
+    return NextResponse.json(
+      { error: "Could not open the billing portal" },
+      { status: 500 }
+    );
   }
 }

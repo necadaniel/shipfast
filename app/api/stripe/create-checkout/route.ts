@@ -1,44 +1,44 @@
 import { NextResponse, NextRequest } from "next/server";
+import { z } from "zod";
 import { auth } from "@/libs/next-auth";
 import { createCheckout } from "@/libs/stripe";
+import { getPlanByPriceId, hasPlan } from "@/libs/plans";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
-import config from "@/config";
 
-// This function is used to create a Stripe Checkout Session (one-time payment or subscription)
-// It's called by the <ButtonCheckout /> component
-// Requires users to be authenticated to proceed with checkout
-// Enforces plan upgrade/downgrade rules:
-// - Users with Solo plan can upgrade to Team plan
-// - Users with Team plan cannot buy anything (already have highest tier)
-// - Users cannot re-purchase their current plan
+const bodySchema = z.object({
+  priceId: z.string().min(1, "Price ID is required"),
+  successUrl: z.url("A valid success URL is required"),
+  cancelUrl: z.url("A valid cancel URL is required"),
+  couponId: z.string().optional(),
+});
+
+// Creates a Stripe Checkout session. Called by <ButtonCheckout />.
+// Users must be signed in so the webhook can match the payment back to them.
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-
-  if (!body.priceId) {
-    return NextResponse.json(
-      { error: "Price ID is required" },
-      { status: 400 }
-    );
-  } else if (!body.successUrl || !body.cancelUrl) {
-    return NextResponse.json(
-      { error: "Success and cancel URLs are required" },
-      { status: 400 }
-    );
-  } else if (!body.mode) {
-    return NextResponse.json(
-      {
-        error:
-          "Mode is required (either 'payment' for one-time payments or 'subscription' for recurring subscription)",
-      },
-      { status: 400 }
-    );
-  }
-
   try {
-    const session = await auth();
+    const parsed = bodySchema.safeParse(await req.json());
 
-    // Require authentication
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: z.prettifyError(parsed.error) },
+        { status: 400 }
+      );
+    }
+
+    const { priceId, successUrl, cancelUrl, couponId } = parsed.data;
+
+    // The checkout mode comes from config, not the client, so a caller can't
+    // turn a subscription price into a one-time payment.
+    const plan = getPlanByPriceId(priceId);
+    if (!plan) {
+      return NextResponse.json(
+        { error: "Unknown plan. Check config.stripe.plans." },
+        { status: 400 }
+      );
+    }
+
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Authentication required" },
@@ -47,65 +47,37 @@ export async function POST(req: NextRequest) {
     }
 
     await connectMongo();
-
-    const { priceId, mode, successUrl, cancelUrl } = body;
-
-    const { id } = session.user;
-    const user = await User.findById(String(id));
+    const user = await User.findById(String(session.user.id));
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get plan names from config
-    const soloPlan = config.stripe.plans.find((p) => p.name === "Solo Developer");
-    const teamPlan = config.stripe.plans.find((p) => p.name === "Team");
-
-    // Determine which plan is being purchased
-    const isPurchasingSolo = priceId === soloPlan?.priceId;
-    const isPurchasingTeam = priceId === teamPlan?.priceId;
-
-    // Check current user plan and enforce rules
-    if (user.plan === "team") {
-      // Users with Team plan cannot purchase anything (highest tier)
+    if (hasPlan(user, priceId)) {
       return NextResponse.json(
-        { error: "You already have the Team plan. To downgrade, please contact support." },
+        { error: `You already have the ${plan.name} plan.` },
         { status: 403 }
       );
     }
 
-    if (user.plan === "solo") {
-      if (isPurchasingSolo) {
-        // Cannot re-purchase Solo plan
-        return NextResponse.json(
-          { error: "You already have the Solo plan." },
-          { status: 403 }
-        );
-      }
-      // Allow upgrading to Team plan (isPurchasingTeam will be true)
-    }
-
-    if (user.plan === "free") {
-      // Free users can purchase either plan
-      // No restrictions
-    }
-
-    const stripeSessionURL = await createCheckout({
+    const url = await createCheckout({
       priceId,
-      mode,
+      mode: plan.mode,
       successUrl,
       cancelUrl,
-      // Pass the user ID to the Stripe Session so it can be retrieved in the webhook later
+      couponId,
+      // Lets the webhook identify the user from the Stripe event
       clientReferenceId: user._id.toString(),
-      // Automatically prefill Checkout data like email and/or credit card for faster checkout
+      // Prefills email / saved cards for a faster checkout
       user,
-      // If you send coupons from the frontend, you can pass it here
-      // couponId: body.couponId,
     });
 
-    return NextResponse.json({ url: stripeSessionURL });
+    return NextResponse.json({ url });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: e?.message }, { status: 500 });
+    console.error("create-checkout:", e);
+    return NextResponse.json(
+      { error: "Could not start checkout" },
+      { status: 500 }
+    );
   }
 }

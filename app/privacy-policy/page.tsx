@@ -1,30 +1,25 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 import { Button } from "@/components/ui/button";
 
-// CHATGPT PROMPT TO GENERATE YOUR PRIVACY POLICY — replace with your own data 👇
-
-// 1. Go to https://chat.openai.com/
-// 2. Copy paste bellow
-// 3. Replace the data with your own (if needed)
-// 4. Paste the answer from ChatGPT directly in the <pre> tag below
-
-// You are an excellent lawyer.
-
-// I need your help to write a simple privacy policy for my website. Here is some context:
-// - Website: https://shipfa.st
-// - Name: ShipFast
-// - Description: A JavaScript code boilerplate to help entrepreneurs launch their startups faster
-// - User data collected: name, email and payment information
-// - Non-personal data collection: web cookies
-// - Purpose of Data Collection: Order processing
-// - Data sharing: we do not share the data with any other parties
-// - Children's Privacy: we do not collect any data from children
-// - Updates to the Privacy Policy: users will be updated by email
-// - Contact information: marc@shipfa.st
-
-// Please write a simple privacy policy for my site. Add the current date.  Do not add or explain your reasoning. Answer:
+// ⚠️ PLACEHOLDER — replace this before you launch.
+//
+// Generate a first draft by pasting the prompt below into any LLM, then have a
+// lawyer review it. Requirements differ by jurisdiction (GDPR, CCPA…).
+//
+//   You are an excellent lawyer. Write a simple privacy policy for my website.
+//   - Website: https://<your-domain>
+//   - Name: <your app>
+//   - User data collected: name, email, payment information
+//   - Non-personal data: web cookies
+//   - Purpose of collection: <...>
+//   - Data sharing: <...>
+//   - Children's privacy: we do not knowingly collect data from children
+//   - Updates: users will be notified by email
+//   - Contact: <your support email>
+//   Add today's date. Do not explain your reasoning.
 
 export const metadata = getSEOTags({
   title: `Privacy Policy | ${config.appName}`,
@@ -33,80 +28,58 @@ export const metadata = getSEOTags({
 
 const PrivacyPolicy = () => {
   return (
-    <main className="max-w-xl mx-auto">
-      <div className="p-5">
-        <Button asChild variant="ghost" size="sm" className="mb-2 gap-2">
-          <Link href="/">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M15 10a.75.75 0 01-.75.75H7.612l2.158 1.96a.75.75 0 11-1.04 1.08l-3.5-3.25a.75.75 0 010-1.08l3.5-3.25a.75.75 0 111.04 1.08L7.612 9.25h6.638A.75.75 0 0115 10z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Back
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-extrabold pb-6">
-          Privacy Policy for {config.appName}
-        </h1>
+    <main className="mx-auto max-w-xl p-5">
+      <Button asChild variant="ghost" size="sm" className="mb-2 gap-2">
+        <Link href="/">
+          <ArrowLeft className="size-4" />
+          Back
+        </Link>
+      </Button>
 
-        <pre
-          className="leading-relaxed whitespace-pre-wrap"
-          style={{ fontFamily: "sans-serif" }}
-        >
-          {`Last Updated: 2023-08-25
+      <h1 className="pb-6 text-3xl font-extrabold">
+        Privacy Policy for {config.appName}
+      </h1>
 
-Thank you for visiting ShipFast ("we," "us," or "our"). This Privacy Policy outlines how we collect, use, and protect your personal and non-personal information when you use our website located at https://shipfa.st (the "Website").
+      <pre className="font-sans leading-relaxed whitespace-pre-wrap">
+        {`Last updated: [DATE]
 
-By accessing or using the Website, you agree to the terms of this Privacy Policy. If you do not agree with the practices described in this policy, please do not use the Website.
+This Privacy Policy explains how ${config.appName} ("we", "us") collects, uses and protects your information when you use https://${config.domainName} (the "Website").
 
 1. Information We Collect
 
-1.1 Personal Data
+Personal data: name, email address and payment information, provided by you when you create an account or make a purchase.
 
-We collect the following personal information from you:
+Non-personal data: web cookies and standard analytics collected automatically as you browse.
 
-Name: We collect your name to personalize your experience and communicate with you effectively.
-Email: We collect your email address to send you important information regarding your orders, updates, and communication.
-Payment Information: We collect payment details to process your orders securely. However, we do not store your payment information on our servers. Payments are processed by trusted third-party payment processors.
+2. How We Use Your Information
 
-1.2 Non-Personal Data
-
-We may use web cookies and similar technologies to collect non-personal information such as your IP address, browser type, device information, and browsing patterns. This information helps us to enhance your browsing experience, analyze trends, and improve our services.
-
-2. Purpose of Data Collection
-
-We collect and use your personal data for the sole purpose of order processing. This includes processing your orders, sending order confirmations, providing customer support, and keeping you updated about the status of your orders.
+[Describe why you collect each category — e.g. order processing, account management, support.]
 
 3. Data Sharing
 
-We do not share your personal data with any third parties except as required for order processing (e.g., sharing your information with payment processors). We do not sell, trade, or rent your personal information to others.
+[Describe who you share data with, e.g. Stripe for payments, Resend for email. State plainly if you do not sell data.]
 
-4. Children's Privacy
+4. Data Retention and Security
 
-ShipFast is not intended for children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below.
+[Describe how long you keep data and how it is protected.]
 
-5. Updates to the Privacy Policy
+5. Your Rights
 
-We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. Any updates will be posted on this page, and we may notify you via email about significant changes.
+[Describe how users can access, export or delete their data.]
 
-6. Contact Information
+6. Children's Privacy
 
-If you have any questions, concerns, or requests related to this Privacy Policy, you can contact us at:
+${config.appName} is not intended for children under 13, and we do not knowingly collect their data. If you believe a child has provided us with personal information, contact us and we will delete it.
 
-Email: marc@shipfa.st
+7. Updates to This Policy
 
-For all other inquiries, please visit our Contact Us page on the Website.
+We may update this policy. Users will be notified of material changes by email.
 
-By using ShipFast, you consent to the terms of this Privacy Policy.`}
-        </pre>
-      </div>
+8. Contact
+
+Questions about this policy: ${config.resend.supportEmail ?? "[YOUR SUPPORT EMAIL]"}
+`}
+      </pre>
     </main>
   );
 };

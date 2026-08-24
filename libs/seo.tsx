@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import config from "@/config";
 
-// These are all the SEO tags you can add to your pages.
-// It prefills data with default title/description/OG, etc.. and you can cusotmize it for each page.
-// It's already added in the root layout.js so you don't have to add it to every page.
-// But I recommend setting the canonical URL for each page (export const metadata = getSEOTags({canonicalUrlRelative: "/"});)
-// See https://shipfa.st/docs/features/seo
+// Default SEO tags for every page. Already applied in app/layout.tsx, so you only
+// need to call this again when you want to override something on a specific page:
+//   export const metadata = getSEOTags({ title: "…", canonicalUrlRelative: "/pricing" });
 export const getSEOTags = ({
   title,
   description,
@@ -15,7 +13,7 @@ export const getSEOTags = ({
   extraTags,
 }: Metadata & {
   canonicalUrlRelative?: string;
-  extraTags?: Record<string, any>;
+  extraTags?: Record<string, unknown>;
 } = {}) => {
   return {
     // up to 50 characters (what does your app do for the user?) > your main should be here
@@ -55,7 +53,7 @@ export const getSEOTags = ({
       // If you add an twitter-image.(jpg|jpeg|png|gif) image to the /app folder, you don't need the code below
       // images: [openGraph?.image || defaults.og.image],
       card: "summary_large_image",
-      creator: "@marc_louvion",
+      // Add your own handle: creator: "@yourhandle",
     },
 
     // If a canonical URL is given, we add it. The metadataBase will turn the relative URL into a fully qualified URL
@@ -68,45 +66,42 @@ export const getSEOTags = ({
   };
 };
 
-// Strctured Data for Rich Results on Google. Learn more: https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data
-// Find your type here (SoftwareApp, Book...): https://developers.google.com/search/docs/appearance/structured-data/search-gallery
-// Use this tool to check that the data is well structured: https://search.google.com/test/rich-results
-// You don't have to use this component, but it increases your chances of having a rich snippet on Google.
-// I recommend adding the one below to your /page.js for software apps: It tells Google that your AppName is a SoftwareApplication, and it has a rating of 4.8/5 from 12 reviews.
-// Fill in the fields with your own data.
-// See https://shipfa.st/docs/features/seo
+// Structured data for rich results on Google.
+// Docs: https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data
+// Validate with: https://search.google.com/test/rich-results
+//
+// Add <RenderSchemaTags /> to your landing page once you have real data to show.
+// Only include aggregateRating if you have genuine reviews — fake ratings are a
+// manual-action risk and Google ignores unverifiable ones anyway.
 export const renderSchemaTags = () => {
+  const cheapestPlan = [...config.stripe.plans].sort(
+    (a, b) => a.price - b.price
+  )[0];
+
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
         __html: JSON.stringify({
-          "@context": "http://schema.org",
+          "@context": "https://schema.org",
           "@type": "SoftwareApplication",
           name: config.appName,
           description: config.appDescription,
           image: `https://${config.domainName}/icon.png`,
           url: `https://${config.domainName}/`,
-          author: {
-            "@type": "Person",
-            name: "Marc Lou",
-          },
-          datePublished: "2023-08-01",
-          applicationCategory: "EducationalApplication",
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: "4.8",
-            ratingCount: "12",
-          },
-          offers: [
-            {
-              "@type": "Offer",
-              price: "9.00",
-              priceCurrency: "USD",
-            },
-          ],
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          ...(cheapestPlan && {
+            offers: [
+              {
+                "@type": "Offer",
+                price: String(cheapestPlan.price),
+                priceCurrency: "USD",
+              },
+            ],
+          }),
         }),
       }}
-    ></script>
+    />
   );
 };

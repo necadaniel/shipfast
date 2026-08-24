@@ -1,119 +1,91 @@
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import ResendProvider from "next-auth/providers/resend";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import config from "@/config";
-import connectMongo from "./mongo";
+import clientPromise from "./mongo";
 
-export const authOptions = {
-  // Set any random key in .env.local
-  secret: process.env.NEXTAUTH_SECRET,
-  providers: [
+// A missing secret makes every auth call 500. In development we fall back to a
+// fixed dev-only value so a fresh clone boots before you've written .env.local.
+// In production this stays undefined on purpose, so it fails loudly instead of
+// signing sessions with a public constant.
+const resolveSecret = (): string | undefined => {
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (secret) return secret;
+
+  if (process.env.NODE_ENV === "production") return undefined;
+
+  console.warn(
+    "\n⚠️  AUTH_SECRET is not set — using an insecure development fallback." +
+      "\n   Generate one with: openssl rand -base64 32\n"
+  );
+  return "development-only-insecure-secret-do-not-use-in-production";
+};
+
+const providers: NextAuthConfig["providers"] = [];
+
+// Google OAuth. Follow the "Login with Google" tutorial to get your credentials.
+if (process.env.GOOGLE_ID && process.env.GOOGLE_SECRET) {
+  providers.push(
     GoogleProvider({
-      // Follow the "Login with Google" tutorial to get your credentials
-      clientId: process.env.GOOGLE_ID!,
-      clientSecret: process.env.GOOGLE_SECRET!,
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
       async profile(profile) {
         return {
           id: profile.sub,
-          name: profile.given_name ? profile.given_name : profile.name,
+          name: profile.given_name || profile.name,
           email: profile.email,
           image: profile.picture,
           createdAt: new Date(),
         };
       },
-    }),
-    // Follow the "Login with Email" tutorial to set up your email server
-    // Requires a MongoDB database. Set MONOGODB_URI env variable.
-    ...(connectMongo
-      ? [
-          ResendProvider({
-            apiKey: process.env.RESEND_API_KEY,
-            from: config.resend.fromNoReply,
-          }),
-        ]
-      : []),
-  ],
-  // New users will be saved in Database (MongoDB Atlas). Each user (model) has some fields like name, email, image, etc..
-  // Requires a MongoDB database. Set MONOGODB_URI env variable.
-  // Learn more about the model type: https://next-auth.js.org/v3/adapters/models
-  ...(connectMongo && { adapter: MongoDBAdapter(connectMongo) }),
+    })
+  );
+}
+
+// Magic links by email. Requires both Resend and a MongoDB database
+// (next-auth stores the one-time tokens in the adapter).
+if (process.env.RESEND_API_KEY && clientPromise) {
+  providers.push(
+    ResendProvider({
+      apiKey: process.env.RESEND_API_KEY,
+      from: config.resend.fromNoReply,
+    })
+  );
+}
+
+export const authOptions: NextAuthConfig = {
+  // Set any random string in AUTH_SECRET (or NEXTAUTH_SECRET) in .env.local
+  secret: resolveSecret(),
+  // Required when deploying anywhere other than Vercel (Render, Fly, a VPS, Docker…)
+  trustHost: true,
+  providers,
+  // New users are stored in MongoDB. Each user document is defined by /models/User.ts
+  ...(clientPromise ? { adapter: MongoDBAdapter(clientPromise) } : {}),
 
   callbacks: {
-    jwt: async ({ token, user, account, profile }: any) => {
-      // On sign in, attach the MongoDB user ID to the token
-      if (user) {
-        token.id = user.id || user._id;
-      }
+    jwt: async ({ token, user }) => {
+      // On sign in, attach the database user ID to the token
+      if (user) token.id = user.id;
       return token;
     },
-    session: async ({ session, token }: any) => {
+    session: async ({ session, token }) => {
       if (session?.user) {
-        // Use the MongoDB user ID from the token
-        session.user.id = token.id || token.sub;
+        session.user.id = (token.id as string) ?? token.sub;
       }
       return session;
     },
   },
-  events: {
-    createUser: async ({ user }: any) => {
-      try {
-        console.log("=== CREATE USER EVENT FIRED ===");
-        console.log("User ID:", user.id);
-        console.log("User email:", user.email);
 
-        // Import dependencies
-        const crypto = await import("crypto");
-        const connectMongoose = (await import("./mongoose")).default;
-
-        // Ensure MongoDB connection is established
-        console.log("Connecting to MongoDB...");
-        await connectMongoose();
-        console.log("MongoDB connected");
-
-        const User = (await import("@/models/User")).default;
-
-        // Generate encryption key immediately on signup
-        const encryptionKey = crypto.randomBytes(32).toString("base64");
-        console.log("Generated encryption key length:", encryptionKey.length);
-
-        // Use $set to ensure fields are added
-        const result = await User.findByIdAndUpdate(
-          user.id,
-          {
-            $set: {
-              hasAccess: false,
-              plan: "free", // New users start with free plan
-              teamId: null,
-              teamRole: null,
-              encryptionKey: encryptionKey,
-              customerId: null,
-              priceId: null,
-            },
-          },
-          { new: true }
-        );
-
-        console.log("Update result:", result ? "Success" : "Failed");
-        if (result) {
-          console.log("User has encryptionKey:", !!result.encryptionKey);
-        }
-        console.log("=== END CREATE USER EVENT ===");
-      } catch (error) {
-        console.error("=== CREATE USER EVENT ERROR ===");
-        console.error(error);
-        console.error("=== END ERROR ===");
-      }
-    },
-  },
   session: {
-    strategy: "jwt" as const,
+    strategy: "jwt",
   },
+
   theme: {
     brandColor: config.colors.main,
-    // Add you own logo below. Recommended size is rectangle (i.e. 200x50px) and show your logo + name.
-    // It will be used in the login flow to display your logo. If you don't add it, it will look faded.
-    logo: `https://${config.domainName}/logoAndName.png`,
+    // Recommended size is a rectangle (~200x50px) showing your logo + name.
+    // Shown in the magic-link email and on the default sign-in page.
+    logo: `https://${config.domainName}/icon.png`,
   },
 };
 

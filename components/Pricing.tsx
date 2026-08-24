@@ -4,10 +4,13 @@ import { Badge } from "@/components/ui/badge";
 
 const Pricing = () => {
   return (
-    <section className="overflow-hidden bg-background py-20 lg:py-28" id="pricing">
+    <section
+      className="bg-background overflow-hidden py-20 lg:py-28"
+      id="pricing"
+    >
       <div className="mx-auto max-w-5xl px-6 lg:px-8">
         <div className="mb-14 text-center">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
+          <p className="text-primary mb-4 text-sm font-semibold tracking-wider uppercase">
             Pricing
           </p>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
@@ -18,7 +21,7 @@ const Pricing = () => {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {config.stripe.plans.map((plan) => (
             <article
-              key={plan.priceId}
+              key={plan.name}
               className={`relative rounded-2xl border p-8 shadow-sm ${
                 plan.isFeatured
                   ? "border-primary bg-primary/5"
@@ -32,7 +35,9 @@ const Pricing = () => {
               )}
 
               <div className="mb-5 space-y-2">
-                <h3 className="text-2xl font-bold tracking-tight">{plan.name}</h3>
+                <h3 className="text-2xl font-bold tracking-tight">
+                  {plan.name}
+                </h3>
                 {plan.description && (
                   <p className="text-muted-foreground">{plan.description}</p>
                 )}
@@ -40,14 +45,14 @@ const Pricing = () => {
 
               <div className="mb-6 flex items-end gap-2">
                 {plan.priceAnchor && (
-                  <span className="pb-1 text-lg text-muted-foreground line-through">
+                  <span className="text-muted-foreground pb-1 text-lg line-through">
                     ${plan.priceAnchor}
                   </span>
                 )}
                 <span className="text-5xl font-extrabold tracking-tight">
                   ${plan.price}
                 </span>
-                <span className="pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <span className="text-muted-foreground pb-1 text-xs font-semibold tracking-wide uppercase">
                   USD
                 </span>
               </div>
@@ -57,9 +62,9 @@ const Pricing = () => {
                   {plan.features.map((feature) => (
                     <li
                       key={feature.name}
-                      className="flex items-start gap-2 text-sm text-muted-foreground"
+                      className="text-muted-foreground flex items-start gap-2 text-sm"
                     >
-                      <span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-primary" />
+                      <span className="bg-primary mt-[7px] size-1.5 shrink-0 rounded-full" />
                       <span>{feature.name}</span>
                     </li>
                   ))}
@@ -68,8 +73,10 @@ const Pricing = () => {
 
               <div className="space-y-2">
                 <ButtonCheckout priceId={plan.priceId} />
-                <p className="text-center text-sm text-muted-foreground">
-                  Secure Stripe checkout.
+                <p className="text-muted-foreground text-center text-sm">
+                  {plan.priceId
+                    ? "Secure Stripe checkout."
+                    : "Set NEXT_PUBLIC_STRIPE_PRICE_* in .env.local"}
                 </p>
               </div>
             </article>

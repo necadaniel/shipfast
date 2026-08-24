@@ -24,11 +24,9 @@ const ButtonAccount = () => {
   const handleBilling = async () => {
     setIsLoading(true);
     try {
-      const { url }: { url: string } = await apiClient.post(
+      const { url } = await apiClient.post<{ url: string }>(
         "/stripe/create-portal",
-        {
-          returnUrl: window.location.href,
-        }
+        { returnUrl: window.location.href }
       );
       window.location.href = url;
     } catch (e) {
@@ -51,7 +49,8 @@ const ButtonAccount = () => {
               referrerPolicy="no-referrer"
             />
             <AvatarFallback className="text-xs">
-              {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0)}
+              {session?.user?.name?.charAt(0) ||
+                session?.user?.email?.charAt(0)}
             </AvatarFallback>
           </Avatar>
 

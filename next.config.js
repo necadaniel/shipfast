@@ -1,38 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Keeps Mongo drivers out of the bundler so their optional native deps
+  // (kerberos, snappy, aws4…) don't produce resolve warnings.
+  serverExternalPackages: ["mongoose", "mongodb"],
   images: {
+    // <Image> needs every remote host whitelisted here.
     remotePatterns: [
-      // NextJS <Image> component needs to whitelist domains for src={}
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-      },
-      {
-        protocol: "https",
-        hostname: "pbs.twimg.com",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "logos-world.net",
-      },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "pbs.twimg.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
     ],
-  },
-  webpack: (config, { webpack, isServer }) => {
-    // Ignore MongoDB's optional dependencies to prevent build warnings
-    if (isServer) {
-      config.plugins.push(
-        new webpack.IgnorePlugin({
-          resourceRegExp: /^(kerberos|@mongodb-js\/zstd|@aws-sdk\/credential-providers|gcp-metadata|snappy|socks|aws4|mongodb-client-encryption)$/,
-        })
-      );
-    }
-
-    return config;
   },
 };
 

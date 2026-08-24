@@ -1,10 +1,16 @@
-import mongoose from "mongoose";
+import mongoose, { type Model } from "mongoose";
 import toJSON from "./plugins/toJSON";
 
-// LEAD SCHEMA is used to store the leads that are generated from the landing page.
-// You would use this if your product isn't ready yet and you want to collect emails
-// The <ButtonLead /> component & the /api/lead route are used to collect the emails
-const leadSchema = new mongoose.Schema(
+// Stores emails collected from the landing page — useful when your product
+// isn't ready yet and you're building a waitlist.
+// Captured by <ButtonLead /> via the /api/lead route.
+export interface ILead {
+  email: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+const leadSchema = new mongoose.Schema<ILead>(
   {
     email: {
       type: String,
@@ -12,16 +18,16 @@ const leadSchema = new mongoose.Schema(
       lowercase: true,
       private: true,
       required: true,
+      unique: true,
     },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
-  },
+  }
 );
 
-// add plugin that converts mongoose to json
 leadSchema.plugin(toJSON);
 
 export default (mongoose.models.Lead ||
-  mongoose.model("Lead", leadSchema)) as mongoose.Model<any>;
+  mongoose.model<ILead>("Lead", leadSchema)) as Model<ILead>;

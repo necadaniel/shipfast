@@ -20,21 +20,33 @@ const features = [
     description:
       "Checkout, customer portal, and webhook lifecycle already wired into your user model.",
     icon: CreditCard,
-    bullets: ["Checkout endpoint", "Billing portal endpoint", "Webhook plan sync"],
+    bullets: [
+      "Checkout endpoint",
+      "Billing portal endpoint",
+      "Webhook plan sync",
+    ],
   },
   {
     title: "Production UI Foundation",
     description:
       "shadcn + Radix primitives with Tailwind v4 tokens ready for SaaS-grade interfaces.",
     icon: ShieldCheck,
-    bullets: ["Theme variables", "Reusable UI primitives", "Accessible interactions"],
+    bullets: [
+      "Theme variables",
+      "Reusable UI primitives",
+      "Accessible interactions",
+    ],
   },
   {
     title: "Launch Velocity",
     description:
       "Focus on product logic while core plumbing is already stable and reusable.",
     icon: Rocket,
-    bullets: ["API client wrapper", "Email integration", "SEO metadata helpers"],
+    bullets: [
+      "API client wrapper",
+      "Email integration",
+      "SEO metadata helpers",
+    ],
   },
 ];
 
@@ -51,7 +63,7 @@ const FeaturesGrid = () => {
           <h2 className="text-4xl font-black tracking-tight md:text-5xl">
             Build once, launch repeatedly
           </h2>
-          <p className="text-lg leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground text-lg leading-relaxed">
             This starter removes repetitive setup work so each new SaaS project
             starts from a tested foundation.
           </p>
@@ -61,19 +73,21 @@ const FeaturesGrid = () => {
           {features.map((feature) => (
             <article
               key={feature.title}
-              className="rounded-2xl border border-border bg-background p-6 shadow-sm"
+              className="border-border bg-background rounded-2xl border p-6 shadow-sm"
             >
-              <div className="mb-4 inline-flex rounded-xl border border-border bg-muted/40 p-2.5">
-                <feature.icon className="size-5 text-primary" />
+              <div className="border-border bg-muted/40 mb-4 inline-flex rounded-xl border p-2.5">
+                <feature.icon className="text-primary size-5" />
               </div>
               <h3 className="mb-2 text-2xl font-bold tracking-tight">
                 {feature.title}
               </h3>
-              <p className="mb-4 text-muted-foreground">{feature.description}</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mb-4">
+                {feature.description}
+              </p>
+              <ul className="text-muted-foreground space-y-2 text-sm">
                 {feature.bullets.map((bullet) => (
                   <li key={bullet} className="flex items-start gap-2">
-                    <span className="mt-[2px] size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span className="bg-primary mt-[2px] size-1.5 shrink-0 rounded-full" />
                     <span>{bullet}</span>
                   </li>
                 ))}
@@ -86,10 +100,10 @@ const FeaturesGrid = () => {
           {quickWins.map((item) => (
             <div
               key={item.text}
-              className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3"
+              className="border-border bg-background flex items-center gap-3 rounded-xl border px-4 py-3"
             >
-              <item.icon className="size-4 text-primary" />
-              <span className="text-sm font-medium text-foreground/90">
+              <item.icon className="text-primary size-4" />
+              <span className="text-foreground/90 text-sm font-medium">
                 {item.text}
               </span>
             </div>

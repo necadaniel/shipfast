@@ -1,5 +1,5 @@
 module.exports = {
-  // REQUIRED: add your own domain name here (e.g. https://shipfa.st),
+  // REQUIRED: set SITE_URL in .env.local to your own domain (e.g. https://yourapp.com)
   siteUrl:
     process.env.SITE_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
