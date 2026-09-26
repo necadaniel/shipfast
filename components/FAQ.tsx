@@ -40,9 +40,10 @@ const faqList: FAQItem[] = [
     question: "Do I need a database?",
     answer: (
       <p>
-        MongoDB is used for user accounts and magic-link tokens. Add your
-        connection string as <code>MONGODB_URI</code> and everything else works
-        out of the box.
+        Supabase stores user accounts, magic-link tokens, and waitlist emails.
+        Add <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+        <code>SUPABASE_SERVICE_ROLE_KEY</code>, run the SQL migration, and
+        expose the <code>next_auth</code> schema. Sign-in works after that.
       </p>
     ),
   },

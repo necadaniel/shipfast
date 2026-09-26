@@ -25,6 +25,10 @@ shadcn/ui. It gets cloned per product, so keep everything here generic.
   It reaches the client bundle — never put secrets in it.
 - A user's plan derives from `user.priceId` via `libs/plans.ts`. Don't add a
   `plan` column.
+- Database is Supabase. Auth.js tables live in the `next_auth` schema
+  (`@auth/supabase-adapter` requires that name). App queries go through
+  `libs/users.ts` and `libs/leads.ts`. New tables go in `supabase/migrations/`
+  and `types/database.ts`. `SUPABASE_SERVICE_ROLE_KEY` is server-only.
 - Missing env vars must degrade gracefully, never break the build. CI builds
   with no secrets.
 - This repo uses Tailwind v4 + shadcn, **not daisyUI**. Classes like `btn`,
@@ -50,5 +54,4 @@ Don't blindly `npm update` these — each breaks the build:
 
 - `typescript` pinned `~6.0.3`: typescript-eslint hard-rejects TS 7.
 - `eslint` stays 9.x: eslint-config-next bundles a plugin incompatible with ESLint 10.
-- `mongodb` stays `^6`: `@auth/mongodb-adapter` peer-requires it.
 - `next-auth`: "latest" on npm is v4; this project tracks `5.0.0-beta.*`.

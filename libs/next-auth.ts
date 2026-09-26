@@ -1,9 +1,11 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import ResendProvider from "next-auth/providers/resend";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import { SupabaseAdapter } from "@auth/supabase-adapter";
 import config from "@/config";
-import clientPromise from "./mongo";
+import { getSupabaseAuthConfig } from "@/libs/supabase";
+
+const supabaseAuth = getSupabaseAuthConfig();
 
 // A missing secret makes every auth call 500. In development we fall back to a
 // fixed dev-only value so a fresh clone boots before you've written .env.local.
@@ -36,16 +38,15 @@ if (process.env.GOOGLE_ID && process.env.GOOGLE_SECRET) {
           name: profile.given_name || profile.name,
           email: profile.email,
           image: profile.picture,
-          createdAt: new Date(),
         };
       },
     })
   );
 }
 
-// Magic links by email. Requires both Resend and a MongoDB database
-// (next-auth stores the one-time tokens in the adapter).
-if (process.env.RESEND_API_KEY && clientPromise) {
+// Magic links by email. Requires both Resend and Supabase — the one-time
+// tokens are stored by the Auth.js adapter in next_auth.verification_tokens.
+if (process.env.RESEND_API_KEY && supabaseAuth) {
   providers.push(
     ResendProvider({
       apiKey: process.env.RESEND_API_KEY,
@@ -60,8 +61,9 @@ export const authOptions: NextAuthConfig = {
   // Required when deploying anywhere other than Vercel (Render, Fly, a VPS, Docker…)
   trustHost: true,
   providers,
-  // New users are stored in MongoDB. Each user document is defined by /models/User.ts
-  ...(clientPromise ? { adapter: MongoDBAdapter(clientPromise) } : {}),
+  // Users, OAuth accounts, and magic-link tokens live in the next_auth schema.
+  // See supabase/migrations. Billing columns are on next_auth.users.
+  ...(supabaseAuth ? { adapter: SupabaseAdapter(supabaseAuth) } : {}),
 
   callbacks: {
     jwt: async ({ token, user }) => {

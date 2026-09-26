@@ -1,8 +1,14 @@
 import { NextResponse, NextRequest } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
-import connectMongo from "@/libs/mongoose";
-import User from "@/models/User";
+import { isSupabaseConfigured } from "@/libs/supabase";
+import {
+  createUser,
+  getUserByCustomerId,
+  getUserByEmail,
+  getUserById,
+  updateUser,
+} from "@/libs/users";
 import { getStripe, findCheckoutSession } from "@/libs/stripe";
 import { getPlanByPriceId } from "@/libs/plans";
 
@@ -42,7 +48,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  await connectMongo();
+  if (!isSupabaseConfigured) {
+    console.error("Supabase is not configured — see .env.example");
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 500 }
+    );
+  }
 
   try {
     switch (event.type) {
@@ -60,20 +72,18 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        let user = userId ? await User.findById(userId) : null;
+        let user = userId ? await getUserById(userId) : null;
 
         // Fall back to matching by email (e.g. a payment link used outside the app)
         if (!user && customerId) {
-          const customer = (await stripe.customers.retrieve(
-            customerId
-          )) as Stripe.Customer;
+          const customer = await stripe.customers.retrieve(customerId);
 
-          if (customer.email) {
+          if (!customer.deleted && customer.email) {
             user =
-              (await User.findOne({ email: customer.email })) ??
-              (await User.create({
+              (await getUserByEmail(customer.email)) ??
+              (await createUser({
                 email: customer.email,
-                name: customer.name ?? undefined,
+                name: customer.name,
               }));
           }
         }
@@ -83,10 +93,11 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        user.priceId = priceId;
-        user.customerId = customerId;
-        user.hasAccess = true;
-        await user.save();
+        await updateUser(user.id, {
+          priceId,
+          ...(customerId ? { customerId } : {}),
+          hasAccess: true,
+        });
 
         // Optional: send a welcome email here with libs/resend.ts
         break;
@@ -109,14 +120,13 @@ export async function POST(req: NextRequest) {
         const customerId = toId(stripeObject.customer);
         if (!customerId) break;
 
-        const user = await User.findOne({ customerId });
+        const user = await getUserByCustomerId(customerId);
         if (!user) break;
 
         // Only extend access for the plan the user actually subscribed to
         if (user.priceId !== priceId) break;
 
-        user.hasAccess = true;
-        await user.save();
+        await updateUser(user.id, { hasAccess: true });
         break;
       }
 
@@ -126,11 +136,10 @@ export async function POST(req: NextRequest) {
         const customerId = toId(stripeObject.customer);
         if (!customerId) break;
 
-        const user = await User.findOne({ customerId });
+        const user = await getUserByCustomerId(customerId);
         if (!user) break;
 
-        user.hasAccess = false;
-        await user.save();
+        await updateUser(user.id, { hasAccess: false });
         break;
       }
 

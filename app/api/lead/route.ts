@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
-import connectMongo from "@/libs/mongoose";
-import Lead from "@/models/Lead";
+import { saveLead } from "@/libs/leads";
 
 const bodySchema = z.object({
   email: z.email("A valid email is required"),
@@ -20,15 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectMongo();
-
-    const { email } = parsed.data;
-
-    // Don't error on duplicates — the user doesn't need to know they already signed up
-    const existing = await Lead.findOne({ email });
-    if (!existing) {
-      await Lead.create({ email });
-    }
+    await saveLead(parsed.data.email);
 
     return NextResponse.json({ ok: true });
   } catch (e) {

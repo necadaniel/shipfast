@@ -2,7 +2,7 @@ import config from "@/config";
 import type { StripePlan } from "@/types/config";
 
 // A user's plan is derived from the Stripe price they paid for, which the webhook
-// stores on the user document. There is no separate `plan` column to keep in sync.
+// stores on the user row. There is no separate `plan` column to keep in sync.
 
 /** Find the configured plan matching a Stripe price ID. */
 export const getPlanByPriceId = (

@@ -14,7 +14,7 @@ Tailwind v4 + shadcn/ui.
 | Framework | Next.js 16 (App Router), React 19, TypeScript (strict) |
 | Styling | Tailwind v4, shadcn/ui, Radix, next-themes |
 | Auth | NextAuth v5 — Google OAuth + email magic links |
-| Database | MongoDB + Mongoose |
+| Database | Supabase (Postgres) |
 | Payments | Stripe Checkout, Customer Portal, webhooks |
 | Email | Resend |
 | Validation | Zod v4 |
@@ -60,15 +60,22 @@ Both dev and build run on Turbopack. (Builds were pinned to `--webpack` on Next
    `resend.*`, `colors.main`, `auth.callbackUrl`, and the `stripe.plans` entries.
    Everything else reads from this file, including the social preview card.
 
-3. **Environment** — copy `.env.example` to `.env.local`. `AUTH_SECRET`
-   (`openssl rand -base64 32`) and `MONGODB_URI` are enough to get sign-in
-   working.
+3. **Database** — create a project at [supabase.com](https://supabase.com). In
+   the SQL editor, run `supabase/migrations/20260926120000_init.sql`. Then open
+   Project Settings → Data API and add `next_auth` to **Exposed schemas**. The
+   Auth.js adapter looks for its tables in that schema; without this step
+   sign-in cannot read them.
 
-4. **Auth** — in Google Cloud, add the redirect URI
+4. **Environment** — copy `.env.example` to `.env.local`. `AUTH_SECRET`
+   (`openssl rand -base64 32`), `NEXT_PUBLIC_SUPABASE_URL`, and
+   `SUPABASE_SERVICE_ROLE_KEY` are enough to get sign-in working. The service
+   role key bypasses row level security and must stay on the server.
+
+5. **Auth** — in Google Cloud, add the redirect URI
    `http://localhost:3000/api/auth/callback/google` plus your production domain.
    Magic links additionally need `RESEND_API_KEY` and a verified sending domain.
 
-5. **Stripe** — create your prices, put the IDs in `NEXT_PUBLIC_STRIPE_PRICE_*`,
+6. **Stripe** — create your prices, put the IDs in `NEXT_PUBLIC_STRIPE_PRICE_*`,
    and set each plan's `mode` in `config.ts` (`"payment"` for one-time,
    `"subscription"` for recurring). For local webhooks:
 
@@ -78,11 +85,11 @@ Both dev and build run on Turbopack. (Builds were pinned to `--webpack` on Next
 
    In production, add `https://<your-domain>/api/webhook/stripe` as an endpoint.
 
-6. **Legal** — `app/tos/page.tsx` and `app/privacy-policy/page.tsx` are
+7. **Legal** — `app/tos/page.tsx` and `app/privacy-policy/page.tsx` are
    placeholders containing prompts to generate a draft. Replace them, and have a
    lawyer review, before launching.
 
-7. **Icons** — replace `app/icon.png` (used as the favicon *and* as the logo in
+8. **Icons** — replace `app/icon.png` (used as the favicon *and* as the logo in
    the header and footer, so it must work at 24px) and `app/apple-icon.png`.
 
    The social preview card is generated from `config.ts` by
@@ -136,17 +143,18 @@ app/
   opengraph-image.tsx     Social card, generated from config.ts
 components/               Landing sections and buttons
 components/ui/            shadcn primitives — regenerate with the CLI
-libs/                     Integrations: auth, stripe, resend, mongo, seo, plans, api
+libs/                     Integrations: auth, supabase, stripe, resend, seo, plans, api
 lib/utils.ts              cn() — kept separate for shadcn's CLI
-models/                   Mongoose schemas
+supabase/migrations/      Postgres schema (Auth.js tables, billing columns, leads)
+types/database.ts         Row types for those tables
 config.ts                 Single source of truth for app metadata + plans
 ```
 
 ## How billing works
 
-The Stripe webhook stores `customerId`, `priceId` and `hasAccess` on the user. A
-user's plan is *derived* from `priceId` via `libs/plans.ts` rather than stored
-separately, so it can never drift out of sync with Stripe.
+The Stripe webhook stores `customerId`, `priceId` and `hasAccess` on
+`next_auth.users`. A user's plan is *derived* from `priceId` via `libs/plans.ts`
+rather than stored separately, so it can never drift out of sync with Stripe.
 
 - `checkout.session.completed` → grant access
 - `invoice.paid` → keep access (recurring payments)

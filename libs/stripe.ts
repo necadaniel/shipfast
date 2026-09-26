@@ -37,8 +37,8 @@ interface CreateCheckoutParams {
   couponId?: string | null;
   clientReferenceId?: string;
   user?: {
-    customerId?: string;
-    email?: string;
+    customerId?: string | null;
+    email?: string | null;
   };
 }
 

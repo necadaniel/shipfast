@@ -1,9 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
 import { auth } from "@/libs/next-auth";
-import connectMongo from "@/libs/mongoose";
 import { createCustomerPortal } from "@/libs/stripe";
-import User from "@/models/User";
+import { getUserById } from "@/libs/users";
 
 const bodySchema = z.object({
   returnUrl: z.url("A valid return URL is required"),
@@ -28,8 +27,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectMongo();
-    const user = await User.findById(String(session.user.id));
+    const user = await getUserById(session.user.id);
 
     if (!user?.customerId) {
       return NextResponse.json(

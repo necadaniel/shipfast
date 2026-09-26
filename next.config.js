@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Keeps Mongo drivers out of the bundler so their optional native deps
-  // (kerberos, snappy, aws4…) don't produce resolve warnings.
-  serverExternalPackages: ["mongoose", "mongodb"],
   images: {
     // <Image> needs every remote host whitelisted here.
     remotePatterns: [

@@ -1,6 +1,6 @@
 import { auth } from "@/libs/next-auth";
-import connectMongo from "@/libs/mongoose";
-import User from "@/models/User";
+import { isSupabaseConfigured } from "@/libs/supabase";
+import { getUserById } from "@/libs/users";
 import { getUserPlan } from "@/libs/plans";
 import { Badge } from "@/components/ui/badge";
 import { getSEOTags } from "@/libs/seo";
@@ -12,8 +12,10 @@ export const metadata = getSEOTags({ title: "Dashboard" });
 export default async function Dashboard() {
   const session = await auth();
 
-  await connectMongo();
-  const user = await User.findById(String(session!.user.id));
+  const user =
+    isSupabaseConfigured && session?.user?.id
+      ? await getUserById(session.user.id)
+      : null;
   const plan = getUserPlan(user);
 
   return (

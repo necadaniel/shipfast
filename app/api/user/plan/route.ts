@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/libs/next-auth";
-import connectMongo from "@/libs/mongoose";
-import User from "@/models/User";
+import { getUserById } from "@/libs/users";
 import { getUserPlan } from "@/libs/plans";
 
 // Returns the signed-in user's access state and current plan.
@@ -17,8 +16,7 @@ export async function GET() {
       );
     }
 
-    await connectMongo();
-    const user = await User.findById(String(session.user.id));
+    const user = await getUserById(session.user.id);
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

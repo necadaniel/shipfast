@@ -99,7 +99,8 @@ Then read these project files for context:
 - ./app/page.tsx
 - ./app/api
 - ./libs
-- ./models
+- ./supabase/migrations
+- ./types/database.ts
 - ./components
 
 Your job:

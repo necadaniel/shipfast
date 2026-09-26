@@ -3,8 +3,7 @@ import { z } from "zod";
 import { auth } from "@/libs/next-auth";
 import { createCheckout } from "@/libs/stripe";
 import { getPlanByPriceId, hasPlan } from "@/libs/plans";
-import connectMongo from "@/libs/mongoose";
-import User from "@/models/User";
+import { getUserById } from "@/libs/users";
 
 const bodySchema = z.object({
   priceId: z.string().min(1, "Price ID is required"),
@@ -46,8 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectMongo();
-    const user = await User.findById(String(session.user.id));
+    const user = await getUserById(session.user.id);
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -67,7 +65,7 @@ export async function POST(req: NextRequest) {
       cancelUrl,
       couponId,
       // Lets the webhook identify the user from the Stripe event
-      clientReferenceId: user._id.toString(),
+      clientReferenceId: user.id,
       // Prefills email / saved cards for a faster checkout
       user,
     });
